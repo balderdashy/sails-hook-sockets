@@ -3,7 +3,7 @@
  */
 
 var SocketIO = require('socket.io');
-
+var interpretIncomingSailsIOMsg = require('./lib/interpret-incoming-sails-io-msg');
 
 
 /**
@@ -34,15 +34,47 @@ module.exports = function (app){
           serveClient: false
         });
 
-        // Set up event listener for new connections
-        io.on('connection', function(socket){
-          console.log('a user connected');
+
+        // Set up socket middleware to authorize the socket
+        // io.use(function(socket, next){
+        //   if (socket.request.headers.cookie) return next();
+        //   next(new Error('Authentication error'));
+        // });
+
+        // Set up event listeners each time a new socket connects
+        io.on('connect', function(socket){
+          console.log('a user-agent connected');
+
+          // Bind socket request handlers
+          // (supports sails.io clients 0.9 and up)
+          (function (bindSocketRequestHandler){
+            bindSocketRequestHandler('get');
+            bindSocketRequestHandler('post');
+            bindSocketRequestHandler('put');
+            bindSocketRequestHandler('delete');
+            bindSocketRequestHandler('patch');
+            bindSocketRequestHandler('options');
+            bindSocketRequestHandler('head');
+          })(function receiveMessage(eventName){
+            socket.on(eventName, function (incomingSailsIOMsg, socketIOClientCallback){
+              receiveIncomingSailsIOMsg({
+                incomingSailsIOMsg: incomingSailsIOMsg,
+                socketIOClientCallback: socketIOClientCallback,
+                eventName: eventName
+              }, undefined, {
+                log: sails.log,
+                app: sails,
+                socket: socket
+              });
+            });
+          });
 
           // Bind disconnect handler
           socket.on('disconnect', function(){
-            console.log('user disconnected');
+            console.log('a user-agent disconnected');
           });
         });
+
       });
 
       return done();
@@ -52,6 +84,7 @@ module.exports = function (app){
 
   };
 };
+
 
 
 

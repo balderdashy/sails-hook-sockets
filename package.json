@@ -5,7 +5,8 @@
   "description": "Implements socket.io support in Sails",
   "keywords": [],
   "dependencies": {
-    "socket.io": "^1.2.1"
+    "socket.io": "^1.2.1",
+    "semver": "^4.1.0"
   },
   "devDependencies": {
     "sails": "^0.10.5",

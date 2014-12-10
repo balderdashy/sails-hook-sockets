@@ -10,5 +10,10 @@
 
 <!-- Connect -->
 <script>
-  var socket = io();
+
+  console.log('Sending socket request to `POST /chickens/roost`...');
+  io.socket.post('/chickens/roost', function (body, JWR){
+    console.log('Received response from `POST /chickens/roost`:',JWR);
+  });
 </script>
+
