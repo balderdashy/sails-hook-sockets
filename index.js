@@ -16,15 +16,15 @@ module.exports = function (app){
 
     initialize: function (done) {
 
-      console.log('Loading new sockets hook...');
-
       if (!app.config.hooks.http) {
         return done(new Error('Cannot use `sockets` hook without the `http` hook.'));
       }
 
-      // If http hook is enabled, wait until the http server is configured
-      // before linking the socket server to it
+      // If http hook is enabled, wait until the http hook is loaded
+      // before trying to attach the socket.io server to our underlying
+      // HTTP server.
       app.after('hook:http:loaded', function () {
+
         // Get access to the http server instance in Sails
         var sailsHttpServer = app.hooks.http.server;
 
