@@ -1,0 +1,21 @@
+{
+  "name": "sails-hook-sockets",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Implements socket.io support in Sails",
+  "keywords": [],
+  "dependencies": {
+    "socket.io": "^1.2.1"
+  },
+  "scripts": {
+    "start": "node app.js",
+    "debug": "node debug app.js"
+  },
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mikermcneil/sails-hook-sockets.git"
+  },
+  "author": "Mike McNeil",
+  "license": ""
+}
