@@ -4,7 +4,6 @@
 
 var SocketIO = require('socket.io');
 var Sails = require('sails').Sails;
-var Http = require('http');
 
 
 //
