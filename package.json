@@ -1,11 +1,14 @@
 {
   "name": "sails-hook-sockets",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.11.0",
   "description": "Implements socket.io support in Sails",
   "keywords": [],
   "dependencies": {
     "socket.io": "^1.2.1"
+  },
+  "devDependencies":{
+    "sails": "^0.10.5"
   },
   "scripts": {
     "start": "node app.js",
