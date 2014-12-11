@@ -79,6 +79,10 @@ module.exports = function (app){
 
       return done();
 
+    },
+
+    defaults: {
+      sockets: {}
     }
 
 
