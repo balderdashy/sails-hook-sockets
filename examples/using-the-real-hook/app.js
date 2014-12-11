@@ -14,7 +14,7 @@ var Filesystem = require('machinepack-fs');
 var app = Sails();
 app.lift({
   globals: false,
-  log: { level: 'silent' },
+  log: { level: 'silly' },
   routes: {
 
     /**
@@ -49,6 +49,14 @@ app.lift({
         return res.send(renderedHtml);
 
       });
+    },
+
+
+    /**
+     * Dumb test route
+     */
+    'post /chickens/roost': function (req, res) {
+      return res.send('the chickens came home');
     }
 
   },

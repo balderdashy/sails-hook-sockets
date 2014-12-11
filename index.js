@@ -3,7 +3,7 @@
  */
 
 var SocketIO = require('socket.io');
-var interpretIncomingSailsIOMsg = require('./lib/interpret-incoming-sails-io-msg');
+var receiveIncomingSailsIOMsg = require('./lib/receive-incoming-sails-io-msg');
 
 
 /**
@@ -62,8 +62,8 @@ module.exports = function (app){
                 socketIOClientCallback: socketIOClientCallback,
                 eventName: eventName
               }, undefined, {
-                log: sails.log,
-                app: sails,
+                log: app.log,
+                app: app,
                 socket: socket
               });
             });
