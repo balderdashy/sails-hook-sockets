@@ -7,12 +7,30 @@ var receiveIncomingSailsIOMsg = require('./lib/receive-incoming-sails-io-msg');
 
 
 /**
- *
+ * `sockets` hook
  */
 
 module.exports = function (app){
   return {
 
+    defaults: {
+      sockets: {
+
+        // Whether to include response headers in the JWR originated for
+        // each socket request (e.g. `io.socket.get()` in the browser)
+        // This doesn't affect direct socket.io usage-- only if you're
+        // communicating with Sails via the request interpreter
+        // (e.g. the sails.io.js browser SDK)
+        sendResponseHeaders: true,
+
+        // Whether to include the status code in the JWR originated for
+        // each socket request (e.g. `io.socket.get()` in the browser)
+        // This doesn't affect direct socket.io usage-- only if you're
+        // communicating with Sails via the request interpreter
+        // (e.g. the sails.io.js browser SDK)
+        sendStatusCode: true
+      }
+    },
 
     initialize: function (done) {
 
@@ -78,28 +96,7 @@ module.exports = function (app){
       });
 
       return done();
-
-    },
-
-    defaults: {
-      sockets: {
-
-        // Whether to include response headers in the JWR originated for
-        // each socket request (e.g. `io.socket.get()` in the browser)
-        // This doesn't affect direct socket.io usage-- only if you're
-        // communicating with Sails via the request interpreter
-        // (e.g. the sails.io.js browser SDK)
-        sendResponseHeaders: true,
-
-        // Whether to include the status code in the JWR originated for
-        // each socket request (e.g. `io.socket.get()` in the browser)
-        // This doesn't affect direct socket.io usage-- only if you're
-        // communicating with Sails via the request interpreter
-        // (e.g. the sails.io.js browser SDK)
-        sendStatusCode: true
-      }
     }
-
 
   };
 };
