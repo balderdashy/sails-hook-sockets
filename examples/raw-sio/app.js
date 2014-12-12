@@ -62,6 +62,9 @@ app.load({
       cb(dataToSendBack);
     });
 
+
+    // return sails.io.nsps['/'].adapter.rooms[roomName];
+
     // Bind disconnect handler
     socket.on('disconnect', function(){
       console.log('user disconnected');
