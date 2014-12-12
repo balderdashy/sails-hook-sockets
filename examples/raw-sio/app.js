@@ -61,7 +61,8 @@ app.load({
       return;
     }
 
-    console.log('Lifted successfully.');
+    console.log('Lifted successfully');
+    console.log('View example at http://localhost:1337/sandbox.html');
   });
 
 

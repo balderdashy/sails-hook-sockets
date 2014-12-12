@@ -25,4 +25,6 @@ app.lift({
   }
 
   console.log('Sails lifted successfully.');
+
+  console.log('View example at http://localhost:1337/sandbox.html');
 });
