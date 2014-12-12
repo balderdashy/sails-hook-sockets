@@ -48,6 +48,20 @@ app.load({
   io.on('connection', function(socket){
     console.log('a user connected');
 
+    // Bind a dummy event listener
+    socket.on('example', function (data, cb){
+      console.log('Received `example` message w/ args: ',arguments);
+
+      var dataToSendBack = {
+        some_things: [{
+          stuff: {
+            more: 'stuff'
+          }
+        }]
+      };
+      cb(dataToSendBack);
+    });
+
     // Bind disconnect handler
     socket.on('disconnect', function(){
       console.log('user disconnected');
