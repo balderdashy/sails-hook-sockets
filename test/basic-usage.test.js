@@ -11,7 +11,32 @@ describe('basic usage', function (){
 
   before(lifecycle.setup);
 
-  it('should work', function (done){
+  it('should not crash', function (done){
+    done();
+  });
+
+  it('should not crash after flinging a bunch of requests at it', function (done){
+
+    io.socket.get('/hello');
+    io.socket.get('/hello', {});
+    io.socket.get('/hello', function (data, jwr){});
+    io.socket.get('/hello', {}, function (data, jwr){});
+
+    io.socket.post('/hello');
+    io.socket.post('/hello', {});
+    io.socket.post('/hello', function (data, jwr){});
+    io.socket.post('/hello', {}, function (data, jwr){});
+
+    io.socket.put('/hello');
+    io.socket.put('/hello', {});
+    io.socket.put('/hello', function (data, jwr){});
+    io.socket.put('/hello', {}, function (data, jwr){});
+
+    io.socket.delete('/hello');
+    io.socket.delete('/hello', {});
+    io.socket.delete('/hello', function (data, jwr){});
+    io.socket.delete('/hello', {}, function (data, jwr){});
+
     done();
   });
 

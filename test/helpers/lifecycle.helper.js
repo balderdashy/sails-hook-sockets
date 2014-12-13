@@ -42,6 +42,7 @@ module.exports = {
 
       // Set some options.
       global.io.sails.url = 'http://localhost:'+TEST_SERVER_PORT;
+      global.io.sails.environment = 'production'; //(to disable logging)
 
       // (Our app is already globalized as `sails` since we didn't disable
       //  globals in the options above.)
