@@ -4,7 +4,7 @@
 
 var Sails = require('sails').Sails;
 var socketioClient = require('socket.io-client');
-var sailsioClient = require('../../sails.io.js');
+var sailsioClient = require('sails.io.js');
 
 
 // Use a weird port to avoid tests failing if we
