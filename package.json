@@ -25,7 +25,7 @@
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/mikermcneil/sails-hook-sockets.git"
+    "url": "git://github.com/balderdashy/sails-hook-sockets.git"
   },
   "sails":{
     "isHook": true
