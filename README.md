@@ -25,7 +25,9 @@ N/A
 ###### `after`
 N/A
 
-##### Bind "shadow" routes...
+
+#### Expose on the `sails` app object:
+N/A
 
 ## FAQ
 
