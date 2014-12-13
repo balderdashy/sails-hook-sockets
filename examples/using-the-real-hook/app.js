@@ -9,8 +9,6 @@ var Sails = require('sails').Sails;
 var Filesystem = require('machinepack-fs');
 
 
-// Load up a quick sails app to serve static files
-// (and be our friendly neighborhood HTTP server)
 var app = Sails();
 app.lift({
   globals: false,
