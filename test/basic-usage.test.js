@@ -3,12 +3,10 @@
  */
 
 var assert = require('assert');
-var Sails = require('sails').Sails;
-var lifecycle = require('./helpers/lifecycle.helper');
+
+
 
 describe('basic usage', function (){
-
-  before(lifecycle.setup);
 
   it('should not crash', function (done){
     done();
@@ -46,6 +44,8 @@ describe('basic usage', function (){
       res.send('yes it worked');
     });
     sails.router.bind('POST /friends', function (req, res){
+      // Test that res.send(), when provided an object, passes it
+      // back out to the client without stringifying.
       res.send({
         id: 7,
         firstName: 'Jimmy',
@@ -53,9 +53,9 @@ describe('basic usage', function (){
       });
     });
 
-
     io.socket.get('/friends', function (data) {
       assert.deepEqual(data, 'yes it worked');
+
       io.socket.post('/friends', function (data) {
         assert.deepEqual(data, {
           id: 7,
@@ -67,7 +67,5 @@ describe('basic usage', function (){
     });
 
   });
-
-  after(lifecycle.teardown);
 
 });
