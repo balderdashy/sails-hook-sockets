@@ -30,7 +30,7 @@ module.exports = {
         // Inject the sockets hook in this repo into this Sails app
         sockets: require('../..')
       },
-      loadHooks: ['moduleloader', 'userconfig', 'http', 'sockets']
+      loadHooks: ['moduleloader', 'userconfig', 'http', 'session', 'sockets']
     },function (err) {
       if (err) return done(err);
 
