@@ -4,7 +4,7 @@
 
 ## Status
 
-> ##### Stability: [2](http://nodejs.org/api/documentation.html#documentation_stability_index) - Unstable
+> ##### Stability: [3](http://nodejs.org/api/documentation.html#documentation_stability_index) - Stable
 
 
 ## Purpose
