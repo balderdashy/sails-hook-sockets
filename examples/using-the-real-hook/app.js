@@ -61,7 +61,7 @@ app.lift({
   hooks: {
     sockets: require('../..')
   },
-  loadHooks: ['moduleloader', 'userconfig', 'http', 'sockets']
+  loadHooks: ['moduleloader', 'userconfig', 'http', 'sockets', 'session']
 }, function (err){
   if (err) {
     console.error('Encountered error while trying to lift Sails:', err);
