@@ -29,7 +29,7 @@ describe('lifecycle events', function (){
 
     app.lift({
       port: 1684,
-      log: { level: 'error' },
+      log: { level: 'warn' },
       globals: false,
       hooks: {
         // Inject the sockets hook in this repo into this Sails app
