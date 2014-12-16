@@ -3,7 +3,7 @@
  */
 
 var assert = require('assert');
-
+var util = require('util');
 
 
 describe('basic usage', function (){
@@ -53,10 +53,12 @@ describe('basic usage', function (){
       });
     });
 
-    io.socket.get('/friends', function (data) {
+    io.socket.get('/friends', function (data, jwr) {
+      assert.equal(jwr.statusCode, 200, 'Expected 200 status code but got '+jwr.statusCode+'\nFull JWR:'+util.inspect(jwr, false, null));
       assert.deepEqual(data, 'yes it worked');
 
-      io.socket.post('/friends', function (data) {
+      io.socket.post('/friends', function (data, jwr) {
+        assert.equal(jwr.statusCode, 200, 'Expected 200 status code but got '+jwr.statusCode+'\nFull JWR:'+util.inspect(jwr, false, null));
         assert.deepEqual(data, {
           id: 7,
           firstName: 'Jimmy',
