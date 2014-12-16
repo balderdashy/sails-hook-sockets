@@ -5,10 +5,10 @@
 var assert = require('assert');
 var util = require('util');
 
+var _ = require('lodash');
 var sails = require('sails');
 var socketioClient = require('socket.io-client');
 var sailsioClient = require('sails.io.js');
-
 
 describe('lifecycle events', function (){
 
@@ -18,11 +18,10 @@ describe('lifecycle events', function (){
   var onConnectArgs;
   var onDisconnectArgs;
 
-  // Since we have to set up a separate app instance and io instance to test this,
-  // we just do that inline here
-  var io;
   var app;
 
+  // Since we have to set up a separate app instance to test this,
+  // we just do that inline here
   before(function (done){
 
     // New up an instance of Sails and lift it.
@@ -50,23 +49,13 @@ describe('lifecycle events', function (){
     },function (err) {
       if (err) return done(err);
 
-      // Instantiate socket client.
-      var client = sailsioClient(socketioClient);
-
-      // Globalize sails.io client as `io`
-      io = client;
-
-      // Set some options.
-      io.sails.url = 'http://localhost:'+1684;
-      io.sails.environment = 'production'; //(to disable logging)
-
       return done(err);
     });
   });
 
   after(function (done){
     app.lower(function () {
-      done();
+      return done();
     });
   });
 
@@ -76,7 +65,7 @@ describe('lifecycle events', function (){
   describe('when a new socket is connected', function (){
 
     it('should trigger onConnect lifecycle event', function (done){
-      newSocket = io.sails.connect();
+      newSocket = io.sails.connect('http://localhost:'+1684);
       newSocket.on('connect', function (){
         if (numTimesOnConnectTriggered !== 1) {
           return done(new Error('`numTimesOnConnectTriggered` should be exactly 1, but is actually '+numTimesOnConnectTriggered));
@@ -93,13 +82,17 @@ describe('lifecycle events', function (){
 
   describe('when a socket is disconnected', function (){
     it('should trigger onDisconnect lifecycle event', function (done){
-      newSocket.disconnect();
       newSocket.on('disconnect', function (){
-        if (numTimesOnDisconnectTriggered !== 1) {
-          return done(new Error('`numTimesOnDisconnectTriggered` should be exactly 1, but is actually '+numTimesOnDisconnectTriggered));
-        }
-        return done();
+        // Wait for a little while to make sure the server had time to actually
+        // run the onDisconnect lifecycle event.
+        setTimeout(function (){
+          if (numTimesOnDisconnectTriggered !== 1) {
+            return done(new Error('`numTimesOnDisconnectTriggered` should be exactly 1, but is actually '+numTimesOnDisconnectTriggered));
+          }
+          return done();
+        }, 1000);
       });
+      newSocket.disconnect();
     });
 
     it('should provide access to socket');
