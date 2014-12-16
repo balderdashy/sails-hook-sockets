@@ -74,9 +74,29 @@ describe('lifecycle events', function (){
       });
     });
 
-    it('should provide access to socket');
+    it('should provide access to socket', function (done){
+      var arg = onConnectArgs[0];
 
-    it('should provide access to session');
+      if (!_.isObject(arg)) {
+        return done(new Error('First argument to lifecycle callback should be a session object. Instead, got:'+ util.inspect(arg, false, null)));
+      }
+      // TODO:
+      // check that it is a valid connect session instance
+      // (duck-type, not instanceof- we just care that it has the right methods)
+      return done();
+    });
+
+    it('should provide access to session', function (done){
+      var arg = onConnectArgs[1];
+
+      if (!_.isObject(arg)) {
+        return done(new Error('Second argument to lifecycle callback should be a socket object. Instead, got:'+ util.inspect(arg, false, null)));
+      }
+      // TODO:
+      // check that it is a valid socket.io Socket instance
+      // (duck-type, not instanceof- we just care that it has the right methods)
+      return done();
+    });
 
   });
 
@@ -95,9 +115,29 @@ describe('lifecycle events', function (){
       newSocket.disconnect();
     });
 
-    it('should provide access to socket');
+    it('should provide access to socket', function (done){
+      var arg = onDisconnectArgs[0];
 
-    it('should provide access to session');
+      if (!_.isObject(arg)) {
+        return done(new Error('First argument to lifecycle callback should be a session object. Instead, got:'+ util.inspect(arg, false, null)));
+      }
+      // TODO:
+      // check that it is a valid connect Session instance
+      // (duck-type, not instanceof- we just care that it has the right methods)
+      return done();
+    });
+
+    it('should provide access to session', function (done){
+      var arg = onDisconnectArgs[1];
+
+      if (!_.isObject(arg)) {
+        return done(new Error('Second argument to lifecycle callback should be a socket object. Instead, got:'+ util.inspect(arg, false, null)));
+      }
+      // TODO:
+      // check that it is a valid socket.io Socket instance
+      // (duck-type, not instanceof- we just care that it has the right methods)
+      return done();
+    });
   });
 
 });
