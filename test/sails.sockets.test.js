@@ -49,7 +49,7 @@ describe('low-level socket methods:', function (){
 
     io.socket.on('connect', function (){
       console.log('ok, now we\'ve connected the initial socket, let\'s connect some more...');
-      async.eachSeries(_.keys(starks), function (key, next){
+      async.each(_.keys(starks), function (key, next){
         console.log('connecting socket for %s',key);
         starks[key] = io.sails.connect('http://localhost:'+TEST_SERVER_PORT, {
           multiplex: false
