@@ -86,15 +86,16 @@ describe('low-level socket methods:', function (){
       }, ERRORPACK.USAGE.constructor);
     });
 
+    it('should return undefined when called w/ string or integer id which does not correspond w/ real socket', function (){
+      assert.equal(sails.sockets.get(7), undefined);
+      assert.equal(sails.sockets.get('7'), undefined);
+    });
+
     it('should return a Socket when called w/ a socket id which points to a real socket', function (){
       var socket = sails.sockets.get(theKing.id);
       assert(socket, 'expected socket to exist');
       assert(_.isString(socket.id), 'expected socket to look like a real Socket');
       assert(_.isFunction(socket.emit), 'expected socket to look like a real Socket');
-    });
-    it('should return undefined when called w/ string or integer id which does not correspond w/ real socket', function (){
-      assert.equal(sails.sockets.get(7), undefined);
-      assert.equal(sails.sockets.get('7'), undefined);
     });
   });
 
