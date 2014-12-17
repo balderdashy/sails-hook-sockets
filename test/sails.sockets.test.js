@@ -17,6 +17,7 @@ describe('sails.sockets.*', function (){
 
 
   // Connect a few additional sockets for use in the tests below
+  // (these will hold **CLIENT-SIDE** SOCKETS!!)
   var starks = {
     bran: undefined,
     rob: undefined,
@@ -24,7 +25,9 @@ describe('sails.sockets.*', function (){
     sansa: undefined,
     ricket: undefined// or whatever his name is
   };
+
   // Create a variable to reference our original `io.socket` (the auto-connecting guy)
+  // (these will hold a **CLIENT-SIDE** SOCKET!!)
   var theKing;
 
   before(function (done){
@@ -58,16 +61,16 @@ describe('sails.sockets.*', function (){
 
   describe('sails.sockets.get()', function (done){
 
-    it('should return a Socket when called w/ a socket id which points to a real socket', function (){
-      var socket = sails.sockets.get(theKing.id);
-      assert(socket, 'expected socket to exist');
-      assert(_.isString(socket.id), 'expected socket to look like a real Socket');
-      assert(_.isFunction(socket.emit), 'expected socket to look like a real Socket');
+    var idOfValidSocket;
+
+    before(function(done){
+      sails.get('/socketMethods/id/helper', function(req, res){
+        idOfValidSocket = req.socket.id;
+        return res.send();
+      });
+      io.socket.get('/socketMethods/id', function (data, jwr){ done(); });
     });
-    it('should return undefined when called w/ string or integer id which does not correspond w/ real socket', function (){
-      assert.equal(sails.sockets.get(7), undefined);
-      assert.equal(sails.sockets.get('7'), undefined);
-    });
+
     it('should throw UsageError when called w/ no arguments', function (){
       assert.throws(function (){
         sails.sockets.get();
@@ -81,6 +84,17 @@ describe('sails.sockets.*', function (){
           }
         ]);
       }, UsageError);
+    });
+
+    it('should return a Socket when called w/ a socket id which points to a real socket', function (){
+      var socket = sails.sockets.get(theKing.id);
+      assert(socket, 'expected socket to exist');
+      assert(_.isString(socket.id), 'expected socket to look like a real Socket');
+      assert(_.isFunction(socket.emit), 'expected socket to look like a real Socket');
+    });
+    it('should return undefined when called w/ string or integer id which does not correspond w/ real socket', function (){
+      assert.equal(sails.sockets.get(7), undefined);
+      assert.equal(sails.sockets.get('7'), undefined);
     });
   });
 
