@@ -229,6 +229,13 @@ describe('low-level socket methods:', function (){
         });
       });
     });
+    it('should properly isolate room membership of different sockets', function (done){
+      starks.bran.get('/socketMethods/socketRooms',function (data, jwr) {
+        if (jwr.error) return done(jwr.error);
+        assert.equal(data.length, 2, 'expected it to return a membership of 2 rooms; instead got '+data.length);
+        return done();
+      });
+    });
   });
 
 
