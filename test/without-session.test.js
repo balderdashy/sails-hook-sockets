@@ -33,7 +33,7 @@ describe('without session', function (){
     app = Sails();
     app.lift({
       port: 1685,
-      log: { level: 'silly' },
+      log: { level: 'warn' },
       globals: false,
       hooks: {
         // Inject the sockets hook in this repo into this Sails app
