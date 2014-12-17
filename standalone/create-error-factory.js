@@ -4,6 +4,7 @@
 
 var util = require('util');
 var _ = require('lodash');
+var createErrorConstructor = require('./create-error-constructor');
 
 
 /**
@@ -20,24 +21,17 @@ var _ = require('lodash');
 
 module.exports = function createErrorFactory(options){
 
-  var code = determineCode(options.code);
-  var name = util.format('Error (%s):', code);
-  var status = options.status || 500;
+  var constructor = createErrorConstructor(options);
 
-  var factory = function makeSJSError(/* messageTpl, data0, data1 */){
-
-    // Determine message
+  // This factory function uses a constructor so that instanceof checks,
+  // i.e. for use w/ Node core's `assert.throws()`, will work
+  var factory = function (/* messageTpl, data0, data1 */){
     var message = determineMessage(arguments);
-
-    // Manufacture an Error instance
-    var _err = new Error();
-    _err.message = message;
-    _err.code = code;
-    _err.name = name;
-    _err.status = status;
-
-    return _err;
+    return new constructor(message);
   };
+
+  // Save reference to related constructor
+  factory.constructor = constructor;
 
   return factory;
 };
@@ -58,23 +52,4 @@ function determineMessage(constructorArgs){
     }
   });
   return util.format.apply(util, constructorArgs);
-}
-
-
-/**
- * ERROR_CODE_PREFIX
- * @type {String}
- */
-var ERROR_CODE_PREFIX = 'SAILS_';
-
-/**
- * Build error code w/ prefix.
- * @param  {[type]} code [description]
- * @return {[type]}      [description]
- */
-function determineCode(code){
-
-  code = (code || 'UNEXPECTED').toUpperCase();
-  code = ERROR_CODE_PREFIX + code;
-  return code;
 }

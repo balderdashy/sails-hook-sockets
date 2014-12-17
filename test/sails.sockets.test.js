@@ -6,11 +6,11 @@ var assert = require('assert');
 var async = require('async');
 var _ = require('lodash');
 
-var UsageError = require('../lib/errors/UsageError');
+var ERRORPACK = require('../lib/errors');
 
 
 
-describe('sails.sockets.*', function (){
+describe('low-level socket methods:', function (){
 
   // Use the globalized default sails instance
   var TEST_SERVER_PORT = 1577;
@@ -71,19 +71,19 @@ describe('sails.sockets.*', function (){
       io.socket.get('/socketMethods/id', function (data, jwr){ done(); });
     });
 
-    it('should throw UsageError when called w/ no arguments', function (){
+    it('should throw USAGE error when called w/ no arguments', function (){
       assert.throws(function (){
         sails.sockets.get();
-      }, UsageError);
+      }, ERRORPACK.USAGE.constructor);
     });
-    it('should throw UsageError when called w/ invalid socket id', function (){
+    it('should throw USAGE error when called w/ invalid socket id', function (){
       assert.throws(function (){
         sails.sockets.get([
           {
             something:'totally invalid'
           }
         ]);
-      }, UsageError);
+      }, ERRORPACK.USAGE.constructor);
     });
 
     it('should return a Socket when called w/ a socket id which points to a real socket', function (){
