@@ -2,6 +2,7 @@
  * Module dependencies
  */
 
+var util = require('util');
 var assert = require('assert');
 var async = require('async');
 var _ = require('lodash');
@@ -11,6 +12,14 @@ var ERRORPACK = require('../lib/errors');
 
 
 describe('low-level socket methods:', function (){
+
+  // Set up helper routes for the tests below
+  before(function(){
+    sails.get('/socketMethods/helpers/getIdOfRequestingSocket', function(req, res){
+      return res.send(req.socket.id);
+    });
+  });
+
 
   // Use the globalized default sails instance
   var TEST_SERVER_PORT = 1577;
@@ -61,15 +70,6 @@ describe('low-level socket methods:', function (){
 
   describe('sails.sockets.get()', function (done){
 
-    var idOfValidSocket;
-
-    before(function(done){
-      sails.get('/socketMethods/id/helper', function(req, res){
-        idOfValidSocket = req.socket.id;
-        return res.send();
-      });
-      io.socket.get('/socketMethods/id', function (data, jwr){ done(); });
-    });
 
     it('should throw USAGE error when called w/ no arguments', function (){
       assert.throws(function (){
@@ -87,15 +87,33 @@ describe('low-level socket methods:', function (){
     });
 
     it('should return undefined when called w/ string or integer id which does not correspond w/ real socket', function (){
-      assert.equal(sails.sockets.get(7), undefined);
-      assert.equal(sails.sockets.get('7'), undefined);
+      assert.throws(function (){
+        sails.sockets.get(7);
+      }, ERRORPACK.NO_SUCH_SOCKET.constructor);
+      assert.throws(function (){
+        sails.sockets.get('7');
+      }, ERRORPACK.NO_SUCH_SOCKET.constructor);
     });
 
-    it('should return a Socket when called w/ a socket id which points to a real socket', function (){
-      var socket = sails.sockets.get(theKing.id);
-      assert(socket, 'expected socket to exist');
-      assert(_.isString(socket.id), 'expected socket to look like a real Socket');
-      assert(_.isFunction(socket.emit), 'expected socket to look like a real Socket');
+    it('should return a Socket when called w/ a socket id which points to a real socket', function (done){
+      io.socket.get('/socketMethods/helpers/getIdOfRequestingSocket', function (data, jwr){
+        if (jwr.statusCode < 200 || jwr.statusCode > 300) {
+          return done(new Error('Unexpected result from test helper (statusCode='+jwr.statusCode+', body='+util.inspect(jwr.body, false, null)+')'));
+        }
+        try {
+          assert.doesNotThrow(function (){
+            assert(jwr.body, 'Consistency violation in tests: expecting `jwr.body` ('+jwr.body+') to exist.');
+            var socket = sails.sockets.get(jwr.body);
+            assert(socket, 'expected socket to exist');
+            assert(_.isString(socket.id), 'expected socket to look like a real Socket');
+            assert(_.isFunction(socket.emit), 'expected socket to look like a real Socket');
+          });
+        }
+        catch (e) {
+          return done(e);
+        }
+        return done();
+      });
     });
   });
 

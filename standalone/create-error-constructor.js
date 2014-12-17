@@ -11,16 +11,16 @@ var _ = require('lodash');
  * for use within Sails core according to the specified options.
  *
  * @param  {Object} options
- * @optional  {String} options.code     [the unique error code, all caps.  will be prefixed automatically]
+ * @optional  {String} options.code     [the "local" unique error code, all caps.  only needs to be local within the namespace/prefix.  will be prefixed automatically]
  * @optional  {String} options.status   [advisory status code for broad categorization]
- * @optional  {String} options.name     [readable error name, PascalCase]
+ * @optional  {String} options.prefix   [prefix for error code- all caps]
  *
  * @return {Function}
  */
 
 module.exports = function createErrorConstructor(options){
 
-  var code = determineCode(options.code);
+  var code = determineCode(options.code, options.prefix);
   var name = util.format('Error (%s):', code);
   var status = options.status || 500;
 
@@ -50,19 +50,15 @@ module.exports = function createErrorConstructor(options){
 
 
 /**
- * ERROR_CODE_PREFIX
- * @type {String}
- */
-var ERROR_CODE_PREFIX = 'SAILS_';
-
-/**
  * Build error code w/ prefix.
  * @param  {[type]} code [description]
+ * @param  {[type]} errorCodePrefix [description]
  * @return {[type]}      [description]
  */
-function determineCode(code){
+function determineCode(code, errorCodePrefix){
 
-  code = (code || 'UNEXPECTED').toUpperCase();
-  code = ERROR_CODE_PREFIX + code;
+  code = code || 'UNEXPECTED';
+  code = (errorCodePrefix||'') + code;
+  code = code.toUpperCase();
   return code;
 }

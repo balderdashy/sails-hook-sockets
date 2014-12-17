@@ -14,14 +14,18 @@ var createErrorConstructor = require('./create-error-constructor');
  * @param  {Object} options
  * @optional  {String} options.code     [the unique error code, all caps.  will be prefixed automatically]
  * @optional  {String} options.status   [advisory status code for broad categorization]
- * @optional  {String} options.name     [readable error name, PascalCase]
+ * @optional  {String} options.prefix   [prefix for error code- all caps]
  *
  * @return {Function}
  */
 
 module.exports = function createErrorFactory(options){
 
-  var constructor = createErrorConstructor(options);
+  var constructor = createErrorConstructor({
+    status: options.status,
+    code: options.code,
+    prefix: options.prefix
+  });
 
   // This factory function uses a constructor so that instanceof checks,
   // i.e. for use w/ Node core's `assert.throws()`, will work
