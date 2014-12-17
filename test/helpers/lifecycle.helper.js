@@ -25,7 +25,7 @@ module.exports = {
 
     app.lift({
       port: TEST_SERVER_PORT,
-      log: { level: 'error' },
+      log: { level: 'warn' },
       hooks: {
         // Inject the sockets hook in this repo into this Sails app
         sockets: require('../..')

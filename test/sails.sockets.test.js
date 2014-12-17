@@ -163,15 +163,62 @@ describe('low-level socket methods:', function (){
 
 
 
-  describe('sails.sockets.socketRooms()', function (done){
-    before(function(){
-      sails.get('/socketMethods/socketRooms', function(req, res){
+  describe('sails.sockets.join()', function (){
+    before(function _setupRoutes(){
+      sails.put('/socketMethods/join', function (req, res){
+        console.log('socket %s joining room %s', sails.sockets.id(req.socket), req.param('room'));
+        sails.sockets.join(req.socket, req.param('room'));
         return res.send();
       });
     });
+    //
+    // we'll use bran for this one
+    //
     it('should not crash', function (done){
-      io.socket.get('/socketMethods/socketRooms', function (data, jwr) {
-        done();
+      starks.bran.put('/socketMethods/join', {
+        room: 'test'
+      }, function (data, jwr) {
+        if (jwr.error) return done(jwr.error);
+        return done();
+      });
+    });
+  });
+
+
+
+
+  describe('sails.sockets.socketRooms()', function (done){
+    before(function(){
+      sails.get('/socketMethods/socketRooms', function(req, res){
+        console.log('socket %s checking room membership...', sails.sockets.id(req.socket));
+        var result1 = sails.sockets.socketRooms(req.socket);
+        var result2 = sails.sockets.socketRooms(req);
+        assert.equal(result2, result1);
+        return res.send(result1);
+      });
+    });
+    it('should not crash or throw', function (done){
+      theKing.get('/socketMethods/socketRooms', function (data, jwr) {
+        if (jwr.error) return done(jwr.error);
+        return done();
+      });
+    });
+    it('should return expected room membership before joining any rooms (1)', function (done){
+      theKing.get('/socketMethods/socketRooms', function (data, jwr) {
+        if (jwr.error) return done(jwr.error);
+        assert.equal(data.length,1, 'expected it to return a membership of 1 room; instead got '+util.inspect(data, false, null));
+        return done();
+      });
+    });
+    it('should return expected room membership after joining some rooms', function (done){
+      theKing.put('/socketMethods/join', { room: 'beast1' }, function (data, jwr) {
+        theKing.put('/socketMethods/join', { room: 'beast2' }, function (data, jwr) {
+          theKing.get('/socketMethods/socketRooms', function (data, jwr) {
+            if (jwr.error) return done(jwr.error);
+            assert.equal(data.length, 3, 'expected it to return a membership of 3 rooms; instead got '+data.length);
+            return done();
+          });
+        });
       });
     });
   });
@@ -207,31 +254,6 @@ describe('low-level socket methods:', function (){
       });
     });
   });
-
-
-
-
-  // •----------------------------------------•
-  //
-  //   ||   The rest
-  //   \/
-  //
-  // •----------------------------------------•
-
-
-  describe('sails.sockets.join()', function (){
-    before(function _setupRoutes(){
-      sails.post('/socketMethods/join', function (req, res){
-        return res.send();
-      });
-    });
-    it('should not crash', function (done){
-      io.socket.post('/socketMethods/join', function (data, jwr) {
-        done();
-      });
-    });
-  });
-
 
 
 
