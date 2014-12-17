@@ -21,6 +21,9 @@ describe('low-level socket methods:', function (){
   });
 
 
+
+
+
   // Use the globalized default sails instance
   var TEST_SERVER_PORT = 1577;
 
@@ -96,18 +99,14 @@ describe('low-level socket methods:', function (){
     });
 
     it('should return a Socket when called w/ a socket id which points to a real socket', function (done){
-      io.socket.get('/socketMethods/helpers/getIdOfRequestingSocket', function (data, jwr){
-        if (jwr.statusCode < 200 || jwr.statusCode > 300) {
-          return done(new Error('Unexpected result from test helper (statusCode='+jwr.statusCode+', body='+util.inspect(jwr.body, false, null)+')'));
-        }
+
+      _getSocketId(theKing, function (err, socketId) {
+        if (err) return done(err);
         try {
-          assert.doesNotThrow(function (){
-            assert(jwr.body, 'Consistency violation in tests: expecting `jwr.body` ('+jwr.body+') to exist.');
-            var socket = sails.sockets.get(jwr.body);
-            assert(socket, 'expected socket to exist');
-            assert(_.isString(socket.id), 'expected socket to look like a real Socket');
-            assert(_.isFunction(socket.emit), 'expected socket to look like a real Socket');
-          });
+          var socket = sails.sockets.get(socketId);
+          assert(socket, 'expected socket to exist');
+          assert(_.isString(socket.id), 'expected socket to look like a real Socket');
+          assert(_.isFunction(socket.emit), 'expected socket to look like a real Socket');
         }
         catch (e) {
           return done(e);
@@ -115,20 +114,50 @@ describe('low-level socket methods:', function (){
         return done();
       });
     });
+
   });
 
 
   describe('sails.sockets.id()', function (done){
-    before(function(){
-      sails.get('/socketMethods/id', function(req, res){
-        return res.send();
+
+    var actualSocketId;
+    before(function (){
+      sails.get('/socketMethods/sails.sockets.id', function (req, res){
+        actualSocketId = req.socket.id;
+
+        var result1 = sails.sockets.id(req.socket);
+        assert.equal(result1, actualSocketId);
+
+        var result2 = sails.sockets.id(req);
+        assert.equal(result2, result1);
+
+        return res.send(result1);
       });
     });
-    it('should not crash', function (done){
-      io.socket.get('/socketMethods/id', function (data, jwr) {
-        done();
+
+    it('should not crash or throw', function (done){
+      theKing.get('/socketMethods/sails.sockets.id', function (data, jwr){
+        if (jwr.error) return done(jwr.error);
+        return done();
       });
     });
+
+    it('should return a string', function (done){
+      theKing.get('/socketMethods/sails.sockets.id', function (data, jwr){
+        if (jwr.error) return done(jwr.error);
+        assert(typeof data === 'string', 'should have returned a string, but instead got:'+data);
+        return done();
+      });
+    });
+
+    it('should return the proper socket id', function (done){
+      theKing.get('/socketMethods/sails.sockets.id', function (data, jwr){
+        if (jwr.error) return done(jwr.error);
+        assert.equal(data, actualSocketId, 'should have returned the proper socketId ('+actualSocketId+'), but instead got:'+data);
+        return done();
+      });
+    });
+
   });
 
 
@@ -269,3 +298,28 @@ describe('low-level socket methods:', function (){
 
 
 });
+
+
+
+
+
+
+// Helper methods:
+//
+
+/**
+ * Given a client-side socket, get its socket id.
+ *
+ * @param  {[type]}   clientSocket [description]
+ * @param  {Function} cb           [description]
+ * @return {[type]}                [description]
+ */
+function _getSocketId(clientSocket, cb){
+  clientSocket.get('/socketMethods/helpers/getIdOfRequestingSocket', function (data, jwr){
+    if (jwr.statusCode < 200 || jwr.statusCode > 300 || !jwr.body) {
+      return cb(new Error('Unexpected result from test helper (statusCode='+jwr.statusCode+', body='+util.inspect(jwr.body, false, null)+')'));
+    }
+    return cb(null, jwr.body);
+  });
+}
+
