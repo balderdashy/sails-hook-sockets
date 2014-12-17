@@ -16,6 +16,7 @@ module.exports = function (app){
 
         'all /*': function addOriginHeader(req, res, next) {
           if (req.isSocket) {
+            // TODO: pull this out - doesn't need to be here
             req.headers = req.headers || {};
             req.headers.origin = req.socket.handshake && req.socket.handshake.headers && req.socket.handshake.headers.origin;
           }

@@ -19,8 +19,8 @@ describe('without session', function (){
   // Used to check state below in tests
   var numTimesOnConnectTriggered = 0;
   var numTimesOnDisconnectTriggered = 0;
-  var onConnectArgs;
-  var onDisconnectArgs;
+  var onConnectArgs = [];
+  var onDisconnectArgs = [];
 
 
   var app;
@@ -32,8 +32,8 @@ describe('without session', function (){
     // New up an instance of Sails and lift it.
     app = Sails();
     app.lift({
-      port: 1684,
-      log: { level: 'warn' },
+      port: 1685,
+      log: { level: 'silly' },
       globals: false,
       hooks: {
         // Inject the sockets hook in this repo into this Sails app
@@ -65,16 +65,17 @@ describe('without session', function (){
 
 
 
-  it('should not crash', function (done){
-    done();
-  });
 
   var newSocket;
 
   describe('when a new socket is connected', function (){
 
+    it('should not crash', function (done){
+      done();
+    });
+
     it('should trigger onConnect lifecycle event', function (done){
-      newSocket = io.sails.connect('http://localhost:'+1684);
+      newSocket = io.sails.connect('http://localhost:'+1685);
       newSocket.on('connect', function (){
         if (numTimesOnConnectTriggered !== 1) {
           return done(new Error('`numTimesOnConnectTriggered` should be exactly 1, but is actually '+numTimesOnConnectTriggered));
@@ -97,6 +98,65 @@ describe('without session', function (){
         return done(new Error('Second argument to lifecycle callback should be a socket object. Instead, got:'+ util.inspect(arg, false, null)));
       }
       return done();
+    });
+
+
+    it('should not crash after flinging a bunch of requests at it', function (done){
+
+      newSocket.get('/hello');
+      newSocket.get('/hello', {});
+      newSocket.get('/hello', function (data, jwr){});
+      newSocket.get('/hello', {}, function (data, jwr){});
+
+      newSocket.post('/hello');
+      newSocket.post('/hello', {});
+      newSocket.post('/hello', function (data, jwr){});
+      newSocket.post('/hello', {}, function (data, jwr){});
+
+      newSocket.put('/hello');
+      newSocket.put('/hello', {});
+      newSocket.put('/hello', function (data, jwr){});
+      newSocket.put('/hello', {}, function (data, jwr){});
+
+      newSocket.delete('/hello');
+      newSocket.delete('/hello', {});
+      newSocket.delete('/hello', function (data, jwr){});
+      newSocket.delete('/hello', {}, function (data, jwr){});
+
+      done();
+    });
+
+
+    it('should respond to requests as expected', function (done){
+
+      app.router.bind('GET /friends', function (req, res){
+        res.send('yes it worked');
+      });
+      app.router.bind('POST /friends', function (req, res){
+        // Test that res.send(), when provided an object, passes it
+        // back out to the client without stringifying.
+        res.send({
+          id: 7,
+          firstName: 'Jimmy',
+          lastName: 'Findingo'
+        });
+      });
+
+      newSocket.get('/friends', function (data, jwr) {
+        assert.equal(jwr.statusCode, 200, 'Expected 200 status code but got '+jwr.statusCode+'\nFull JWR:'+util.inspect(jwr, false, null));
+        assert.deepEqual(data, 'yes it worked');
+
+        newSocket.post('/friends', function (data, jwr) {
+          assert.equal(jwr.statusCode, 200, 'Expected 200 status code but got '+jwr.statusCode+'\nFull JWR:'+util.inspect(jwr, false, null));
+          assert.deepEqual(data, {
+            id: 7,
+            firstName: 'Jimmy',
+            lastName: 'Findingo'
+          });
+          done();
+        });
+      });
+
     });
 
   });
@@ -133,65 +193,6 @@ describe('without session', function (){
       }
       return done();
     });
-  });
-
-
-  it('should not crash after flinging a bunch of requests at it', function (done){
-
-    newSocket.get('/hello');
-    newSocket.get('/hello', {});
-    newSocket.get('/hello', function (data, jwr){});
-    newSocket.get('/hello', {}, function (data, jwr){});
-
-    newSocket.post('/hello');
-    newSocket.post('/hello', {});
-    newSocket.post('/hello', function (data, jwr){});
-    newSocket.post('/hello', {}, function (data, jwr){});
-
-    newSocket.put('/hello');
-    newSocket.put('/hello', {});
-    newSocket.put('/hello', function (data, jwr){});
-    newSocket.put('/hello', {}, function (data, jwr){});
-
-    newSocket.delete('/hello');
-    newSocket.delete('/hello', {});
-    newSocket.delete('/hello', function (data, jwr){});
-    newSocket.delete('/hello', {}, function (data, jwr){});
-
-    done();
-  });
-
-
-  it('should respond to requests as expected', function (done){
-
-    app.router.bind('GET /friends', function (req, res){
-      res.send('yes it worked');
-    });
-    app.router.bind('POST /friends', function (req, res){
-      // Test that res.send(), when provided an object, passes it
-      // back out to the client without stringifying.
-      res.send({
-        id: 7,
-        firstName: 'Jimmy',
-        lastName: 'Findingo'
-      });
-    });
-
-    newSocket.get('/friends', function (data, jwr) {
-      assert.equal(jwr.statusCode, 200, 'Expected 200 status code but got '+jwr.statusCode+'\nFull JWR:'+util.inspect(jwr, false, null));
-      assert.deepEqual(data, 'yes it worked');
-
-      newSocket.post('/friends', function (data, jwr) {
-        assert.equal(jwr.statusCode, 200, 'Expected 200 status code but got '+jwr.statusCode+'\nFull JWR:'+util.inspect(jwr, false, null));
-        assert.deepEqual(data, {
-          id: 7,
-          firstName: 'Jimmy',
-          lastName: 'Findingo'
-        });
-        done();
-      });
-    });
-
   });
 
 });
