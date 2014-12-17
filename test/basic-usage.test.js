@@ -70,4 +70,7 @@ describe('basic usage', function (){
 
   });
 
+  it('should not expose all of the CORS response headers');
+
+
 });

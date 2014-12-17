@@ -31,10 +31,6 @@ describe('with session', function (){
     });
   });
 
-
-  it('should not expose all of the CORS response headers');
-
-
   it('should maintain session between requests', function (done){
 
     io.socket.put('/me/jamiroquai', function (unused, jwr) {

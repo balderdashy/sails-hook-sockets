@@ -22,7 +22,7 @@
     "socket.io-client": "^1.2.1"
   },
   "scripts": {
-    "test": "node ./node_modules/mocha/bin/mocha -b"
+    "test": "node ./node_modules/mocha/bin/mocha -b --timeout 5000"
   },
   "main": "index.js",
   "repository": {
