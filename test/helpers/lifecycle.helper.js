@@ -25,7 +25,7 @@ module.exports = {
 
     app.lift({
       port: TEST_SERVER_PORT,
-      log: { level: 'warn' },
+      log: { level: 'verbose' },
       hooks: {
         // Inject the sockets hook in this repo into this Sails app
         sockets: require('../..')
@@ -43,6 +43,7 @@ module.exports = {
       // Set some options.
       global.io.sails.url = 'http://localhost:'+TEST_SERVER_PORT;
       global.io.sails.environment = 'production'; //(to disable logging)
+      global.io.sails.multiplex = false; // (to allow for clean testing of multiple connected sockets)
 
       // (Our app is already globalized as `sails` since we didn't disable
       //  globals in the options above.)
