@@ -31,6 +31,7 @@ describe('low-level socket methods:', function (){
   // Connect a few additional sockets for use in the tests below
   // (these will hold **CLIENT-SIDE** SOCKETS!!)
   var starks = {
+    ned: undefined,
     bran: undefined,
     rob: undefined,
     arya: undefined,
@@ -267,18 +268,76 @@ describe('low-level socket methods:', function (){
 
 
   describe('sails.sockets.broadcast()', function (done){
-    before(function(){
+    before(function(done){
       sails.post('/socketMethods/broadcast', function(req, res){
+        sails.sockets.broadcast(req.param('room'), req.param('data'));
         return res.send();
       });
-    });
-    it('should not crash', function (done){
-      theKing.post('/socketMethods/broadcast', function (data, jwr) {
-        if (jwr.error) return done(jwr.error);
 
-        return done();
+      // Have all of our starks except for Ned join the 'winterfell' room,
+      // AND start listening for "message" events.
+      async.each(_.keys(starks), function (key, next){
+
+        // (skip ned)
+        if (key === 'ned') return next();
+
+        var clientSocket = starks[key];
+
+        // Listen for message events
+        clientSocket.on('message', function (event){
+          clientSocket._testMsgsReceived = clientSocket._testMsgsReceived || [];
+          clientSocket._testMsgsReceived.push(event);
+        });
+
+        // Join the "winterfell" room.
+        clientSocket.put('/socketMethods/join', {
+          room: 'winterfell'
+        }, function (data, jwr) {
+          if (jwr.error) return next(jwr.error);
+          return next();
+        });
+      }, done);
+    });
+
+    describe('king\'s announcement', function (){
+
+      before(function (done){
+
+        // Make announcement
+        theKing.post('/socketMethods/broadcast', {
+          room: 'winterfell',
+          data: {
+            stuff: 'and things'
+          }
+        }, function (data, jwr) {
+          if (jwr.error) return done(jwr.error);
+
+          // wait a moment to give socket.io time to deliver the messages
+          setTimeout(function (){
+            done();
+          }, 250);
+        });
+      });
+
+      describe('living starks', function (){
+        it('should have received a message', function (){
+          _.each(starks, function (clientSocket, key){
+            // Skip ned
+            if (key === 'ned') {
+              return;
+            }
+            assert(clientSocket._testMsgsReceived.length === 1, 'expecting 1 message to be received for the living starks, but got '+clientSocket._testMsgsReceived.length);
+          });
+        });
+      });
+
+      describe('ned', function (){
+        it('should not have received a message', function (){
+          assert(starks.ned._testMsgsReceived.length === 1, 'expecting 0 messages to be received for ned, but got '+starks.ned._testMsgsReceived.length);
+        });
       });
     });
+
   });
 
 
