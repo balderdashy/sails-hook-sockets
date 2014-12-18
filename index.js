@@ -2,7 +2,7 @@
  * Module dependencies
  */
 
-var ERRORPACK = require('./errors');
+var ERRORPACK = require('./lib/errors');
 
 
 
