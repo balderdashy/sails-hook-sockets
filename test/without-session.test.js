@@ -75,7 +75,9 @@ describe('without session', function (){
     });
 
     it('should trigger onConnect lifecycle event', function (done){
-      newSocket = io.sails.connect('http://localhost:'+1685);
+      newSocket = io.sails.connect('http://localhost:'+1685, {
+        multiplex: false
+      });
       newSocket.on('connect', function (){
         if (numTimesOnConnectTriggered !== 1) {
           return done(new Error('`numTimesOnConnectTriggered` should be exactly 1, but is actually '+numTimesOnConnectTriggered));

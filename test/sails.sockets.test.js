@@ -47,19 +47,19 @@ describe('low-level socket methods:', function (){
 
     // Thematically relevant reference to `io.socket`
     theKing = io.socket;
-
-    io.socket.on('connect', function (){
-      // console.log('ok, now we\'ve connected the initial socket, let\'s connect some more...');
-      async.each(_.keys(starks), function (key, next){
-        // console.log('connecting socket for %s',key);
-        starks[key] = io.sails.connect('http://localhost:'+TEST_SERVER_PORT, {
-          multiplex: false
-        });
-        starks[key].on('connect', function(){
-          // console.log('socket for %s connected!', key);
-          next();
-        });
-      }, done);
+    // console.log('ok, now we\'ve connected the initial socket, let\'s connect some more...');
+    async.each(_.keys(starks), function (key, next){
+      // console.log('connecting socket for %s',key);
+      starks[key] = io.sails.connect('http://localhost:'+TEST_SERVER_PORT, {
+        multiplex: false
+      });
+      starks[key].on('connect', function(){
+        // console.log('socket for %s connected!', key);
+        next();
+      });
+    }, function (err) {
+      if (err) return done(err);
+      done(err);
     });
 
   });
