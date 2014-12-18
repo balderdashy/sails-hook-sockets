@@ -174,8 +174,8 @@ describe('low-level socket methods:', function (){
   describe('sails.sockets.join()', function (){
     before(function _setupRoutes(){
       sails.put('/socketMethods/join', function (req, res){
-        console.log('socket %s joining room %s', sails.sockets.id(req.socket), req.param('room'));
-        sails.sockets.join(req.socket, req.param('room'));
+        // console.log('socket %s joining room %s', sails.sockets.id(req.socket), req.param('room'));
+        sails.sockets.join(req, req.param('room'));
         return res.send();
       });
     });
@@ -198,7 +198,7 @@ describe('low-level socket methods:', function (){
   describe('sails.sockets.socketRooms()', function (done){
     before(function(){
       sails.get('/socketMethods/socketRooms', function(req, res){
-        console.log('socket %s checking room membership...', sails.sockets.id(req.socket));
+        // console.log('socket %s checking room membership...', sails.sockets.id(req.socket));
         var result1 = sails.sockets.socketRooms(req.socket);
         var result2 = sails.sockets.socketRooms(req);
         assert.equal(result2, result1);
@@ -241,46 +241,24 @@ describe('low-level socket methods:', function (){
 
 
 
-  describe('sails.sockets.rooms()', function (done){
-    before(function(){
-      sails.get('/socketMethods/rooms', function(req, res){
-        return res.send();
-      });
-    });
-    it('should not crash', function (done){
-      io.socket.get('/socketMethods/rooms', function (data, jwr) {
-        done();
-      });
-    });
-  });
-
-
-
-
-  describe('sails.sockets.subscribers()', function (done){
-    before(function(){
-      sails.get('/socketMethods/subscribers', function(req, res){
-        return res.send();
-      });
-    });
-    it('should not crash', function (done){
-      io.socket.get('/socketMethods/subscribers', function (data, jwr) {
-        done();
-      });
-    });
-  });
-
-
 
   describe('sails.sockets.leave()', function (done){
     before(function(){
-      sails.post('/socketMethods/leave', function(req, res){
-        return res.send();
+      sails.delete('/socketMethods/leave', function(req, res){
+        var result1 = sails.sockets.leave(req, req.param('room'));
+        return res.send(result1);
       });
     });
-    it('should not crash', function (done){
-      io.socket.post('/socketMethods/leave', function (data, jwr) {
-        done();
+    it('should remove the target room from the list of rooms a socket is connected to', function (done){
+      theKing.delete('/socketMethods/leave', { room: 'beast1' }, function (data, jwr) {
+        if (jwr.error) return done(jwr.error);
+
+        theKing.get('/socketMethods/socketRooms',function (data, jwr) {
+          if (jwr.error) return done(jwr.error);
+          assert.equal(data.length, 2, 'expected it to return a membership of 2 rooms; instead got '+util.inspect(data));
+          assert(_.indexOf(data, 'beast1') === -1, 'expected `beast1` to have been removed from room membership list, but room membership is still: '+data);
+          return done();
+        });
       });
     });
   });
@@ -295,13 +273,52 @@ describe('low-level socket methods:', function (){
       });
     });
     it('should not crash', function (done){
-      io.socket.post('/socketMethods/broadcast', function (data, jwr) {
-        done();
+      theKing.post('/socketMethods/broadcast', function (data, jwr) {
+        if (jwr.error) return done(jwr.error);
+
+        return done();
       });
     });
   });
 
 
+
+
+
+
+
+  describe('sails.sockets.rooms()', function (done){
+    before(function(){
+      sails.get('/socketMethods/rooms', function(req, res){
+        return res.send();
+      });
+    });
+    it('should not crash', function (done){
+      theKing.get('/socketMethods/rooms', function (data, jwr) {
+        if (jwr.error) return done(jwr.error);
+
+        return done();
+      });
+    });
+  });
+
+
+
+
+  describe('sails.sockets.subscribers()', function (done){
+    before(function(){
+      sails.get('/socketMethods/subscribers', function(req, res){
+        return res.send();
+      });
+    });
+    it('should not crash', function (done){
+      theKing.get('/socketMethods/subscribers', function (data, jwr) {
+        if (jwr.error) return done(jwr.error);
+
+        return done();
+      });
+    });
+  });
 
 
   describe('sails.sockets.emit()', function (done){
@@ -311,8 +328,10 @@ describe('low-level socket methods:', function (){
       });
     });
     it('should not crash', function (done){
-      io.socket.post('/socketMethods/emit', function (data, jwr) {
-        done();
+      theKing.post('/socketMethods/emit', function (data, jwr) {
+        if (jwr.error) return done(jwr.error);
+
+        return done();
       });
     });
   });
@@ -327,8 +346,10 @@ describe('low-level socket methods:', function (){
       });
     });
     it('should not crash', function (done){
-      io.socket.post('/socketMethods/blast', function (data, jwr) {
-        done();
+      theKing.post('/socketMethods/blast', function (data, jwr) {
+        if (jwr.error) return done(jwr.error);
+
+        return done();
       });
     });
   });
