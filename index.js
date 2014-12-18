@@ -1,4 +1,13 @@
 /**
+ * Module dependencies
+ */
+
+var ERRORPACK = require('./errors');
+
+
+
+
+/**
  * `sockets` hook
  */
 
@@ -32,6 +41,10 @@ module.exports = function (app){
       if (app.config.sockets.allowRequest === true) {
         app.log.debug('Deprecation warning: `sails.config.allowRequest` does not allow the `true` setting anymore (setting it to `undefined` for you this time)');
         app.config.sockets.allowRequest = undefined;
+      }
+
+      if (app.config.sockets.allowRequest && !_.isFunction(app.config.sockets.allowRequest)) {
+        throw ERRORPACK.CONFIG('Expected `sails.config.sockets.allowRequest` to be a function');
       }
 
     },
