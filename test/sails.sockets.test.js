@@ -270,56 +270,80 @@ describe('low-level socket methods:', function (){
   describe('sails.sockets.broadcast()', function (done){
     before(function(done){
       sails.post('/socketMethods/broadcast', function(req, res){
-        sails.sockets.broadcast(req.param('room'), req.param('data'));
+
+        // supply "socketToOmit"
+        var eventName = 'message';
+        sails.sockets.broadcast(req.param('room'), eventName, req.param('data'), req);
         return res.send();
       });
 
-      // Have all of our starks except for Ned join the 'winterfell' room,
-      // AND start listening for "message" events.
-      async.each(_.keys(starks), function (key, next){
-
-        // (skip ned)
-        if (key === 'ned') return next();
-
-        var clientSocket = starks[key];
-
-        // Listen for message events
-        clientSocket.on('message', function (event){
-          clientSocket._testMsgsReceived = clientSocket._testMsgsReceived || [];
-          clientSocket._testMsgsReceived.push(event);
-        });
-
-        // Join the "winterfell" room.
-        clientSocket.put('/socketMethods/join', {
-          room: 'winterfell'
-        }, function (data, jwr) {
-          if (jwr.error) return next(jwr.error);
-          return next();
-        });
-      }, done);
+      done();
     });
 
     describe('king\'s announcement', function (){
 
       before(function (done){
 
-        // Make announcement
-        theKing.post('/socketMethods/broadcast', {
-          room: 'winterfell',
-          data: {
-            stuff: 'and things'
-          }
-        }, function (data, jwr) {
-          if (jwr.error) return done(jwr.error);
+        // Have all of our starks except for Ned join the 'winterfell' room,
+        // AND start listening for "message" events.
+        async.each(_.keys(starks), function (key, next){
 
-          // wait a moment to give socket.io time to deliver the messages
-          setTimeout(function (){
-            done();
-          }, 250);
+          // (skip ned)
+          if (key === 'ned') return next();
+
+          var clientSocket = starks[key];
+
+          // Listen for message events
+          clientSocket.on('message', function (event){
+            clientSocket._testMsgsReceived = clientSocket._testMsgsReceived || [];
+            clientSocket._testMsgsReceived.push(event);
+          });
+
+          // Join the "winterfell" room.
+          clientSocket.put('/socketMethods/join', {
+            room: 'winterfell'
+          }, function (data, jwr) {
+            if (jwr.error) return next(jwr.error);
+            return next();
+          });
+        }, function (err){
+          if (err) return done(err);
+
+          // Now have the king also join "winterfell"...
+          theKing.put('/socketMethods/join', {
+            room: 'winterfell'
+          }, function (data, jwr){
+            if (jwr.error) return next(jwr.error);
+
+            // ...listen for his own announcemnt...
+            // (which he should ignore, because our test "broadcast" endpoint below uses the `socketToOmit` arg)
+            theKing.on('message', function (event){
+              theKing._testMsgsReceived = theKing._testMsgsReceived || [];
+              theKing._testMsgsReceived.push(event);
+            });
+
+            // ...and make his announcement.
+            theKing.post('/socketMethods/broadcast', {
+              room: 'winterfell',
+              data: {
+                stuff: 'and things'
+              }
+            }, function (data, jwr) {
+              if (jwr.error) return done(jwr.error);
+
+              // wait a moment to give socket.io time to deliver the messages
+              setTimeout(function (){
+                done();
+              }, 250);
+            });
+
+          });
+
         });
+
       });
 
-      describe('living starks', function (){
+      describe('living Starks (broadcast to room members)', function (){
         it('should have received a message', function (){
           _.each(starks, function (clientSocket, key){
             // Skip ned
@@ -331,9 +355,15 @@ describe('low-level socket methods:', function (){
         });
       });
 
-      describe('ned', function (){
+      describe('Ned Stark (dont broadcast to outsiders)', function (){
         it('should not have received a message', function (){
-          assert(!starks.ned._testMsgsReceived, 'expecting `_testMsgsReceived` to not exist, since no msgs were to be received for ned, but got '+starks.ned._testMsgsReceived);
+          assert(!starks.ned._testMsgsReceived, 'expecting `_testMsgsReceived` to not exist, since no msgs were to be received for ned, but got '+util.inspect(starks.ned._testMsgsReceived));
+        });
+      });
+
+      describe('The King (dont broadcast to `socketToOmit`)', function (){
+        it('should not have received a message (since we used the `socketToOmit` arg)', function (){
+          assert(!theKing._testMsgsReceived, 'expecting `_testMsgsReceived` to not exist, since no msgs were to be received for king, but got '+util.inspect(theKing._testMsgsReceived));
         });
       });
     });
