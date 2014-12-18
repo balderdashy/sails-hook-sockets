@@ -333,7 +333,7 @@ describe('low-level socket methods:', function (){
 
       describe('ned', function (){
         it('should not have received a message', function (){
-          assert(starks.ned._testMsgsReceived.length === 1, 'expecting 0 messages to be received for ned, but got '+starks.ned._testMsgsReceived.length);
+          assert(!starks.ned._testMsgsReceived, 'expecting `_testMsgsReceived` to not exist, since no msgs were to be received for ned, but got '+starks.ned._testMsgsReceived);
         });
       });
     });
