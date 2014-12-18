@@ -33,7 +33,7 @@ describe('low-level socket methods:', function (){
   var starks = {
     ned: undefined,
     bran: undefined,
-    rob: undefined,
+    jon: undefined,
     arya: undefined,
     sansa: undefined,
     ricket: undefined// or whatever his name is
@@ -373,6 +373,88 @@ describe('low-level socket methods:', function (){
 
 
 
+  describe('sails.sockets.emit()', function (done){
+    before(function(){
+      sails.post('/socketMethods/emit', function(req, res){
+        sails.sockets.emit(req.param('recipients'), 'otherworldly', req.param('data'));
+        return res.send();
+      });
+    });
+
+    before(function (err){
+
+      // Look up the socket ids for each Stark
+      var starkSocketIds = {};
+      async.each(_.keys(starks), function (key, next){
+        var clientSocket = starks[key];
+
+        // Listen for the "otherwordly" event type
+        clientSocket.on('otherworldly', function(event){
+          clientSocket._otherworldlyMsgsReceived = clientSocket._otherworldlyMsgsReceived || [];
+          clientSocket._otherworldlyMsgsReceived.push(event);
+        });
+
+        // Lookup socket id
+        _getSocketId(clientSocket, function (err,socketId){
+          if (err) return next(err);
+          starkSocketIds[key] = socketId;
+          return next();
+        });
+      }, function afterwards(err) {
+        if (err) return done(err);
+
+        // Now have each one of them emit a message to Ned
+        async.each(_.keys(starks), function (firstName, next){
+          // (skip ned)
+          if (firstName === 'ned') return next();
+
+          starks[firstName].post('/socketMethods/emit', {
+            recipients: starkSocketIds.ned,
+            data: 'hi pops!'
+          }, function (data, jwr){
+            if (jwr.error) return next(jwr.error);
+            return next();
+          });
+        }, function (err){
+          if (err) return done(err);
+
+
+          // Now have Ned emit a message back addressing everyone else
+          var arrayOfLivingStarkSocketIds = _.reduce(starkSocketIds, function (memo, socketId, firstName){
+            if (firstName !== 'ned') memo.push(socketId);
+            return memo;
+          }, []);
+          starks.ned.post('/socketMethods/emit', {
+            recipients: starkSocketIds,
+            data: 'hello children'
+          }, function (data, jwr){
+            if (jwr.error) return done(jwr.error);
+            return done();
+          });
+        });
+
+      });
+
+    });
+
+    it('should not crash', function (done){
+      done();
+    });
+
+    describe('living starks', function (){
+      it('should have received 1 "otherwordly" msg', function(){
+        _.each(starks, function (clientSocket, firstName) {
+          assert.equal(clientSocket._otherworldlyMsgsReceived, (_.keys(starks).length-1), 'expected '+(_.keys(starks).length-1)+' "otherworldly" message for '+firstName+', but got '+clientSocket._otherworldlyMsgsReceived.length);
+        });
+      });
+    });
+    describe('ned', function (){
+      it('should have received many "otherwordly" msgs', function(){
+        assert.equal(starks.ned._otherworldlyMsgsReceived, (_.keys(starks).length-1), 'expected '+(_.keys(starks).length-1)+' "otherworldly" message for Ned, but got '+starks.ned._otherworldlyMsgsReceived.length);
+      });
+    });
+  });
+
 
 
 
@@ -408,24 +490,6 @@ describe('low-level socket methods:', function (){
       });
     });
   });
-
-
-  describe('sails.sockets.emit()', function (done){
-    before(function(){
-      sails.post('/socketMethods/emit', function(req, res){
-        return res.send();
-      });
-    });
-    it('should not crash', function (done){
-      theKing.post('/socketMethods/emit', function (data, jwr) {
-        if (jwr.error) return done(jwr.error);
-
-        return done();
-      });
-    });
-  });
-
-
 
 
   describe('sails.sockets.blast()', function (done){
