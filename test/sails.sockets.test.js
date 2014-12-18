@@ -461,18 +461,19 @@ describe('low-level socket methods:', function (){
 
 
 
-  ////////////////////// TODO //////////////////////////////////////////////////////
-
   describe('sails.sockets.rooms()', function (done){
     before(function(){
       sails.get('/socketMethods/rooms', function(req, res){
-        return res.send();
+        var roomIds = sails.sockets.rooms();
+        return res.send(roomIds);
       });
     });
     it('should not crash', function (done){
       theKing.get('/socketMethods/rooms', function (data, jwr) {
         if (jwr.error) return done(jwr.error);
-
+        assert(_.contains(data, 'beast2'), 'beast2 room should be in array returned from sails.sockets.rooms()');
+        assert(_.contains(data, 'test'), 'test room should be in array returned from sails.sockets.rooms()');
+        assert(_.contains(data, 'winterfell'), 'winterfell room should be in array returned from sails.sockets.rooms()');
         return done();
       });
     });
@@ -484,13 +485,39 @@ describe('low-level socket methods:', function (){
   describe('sails.sockets.subscribers()', function (done){
     before(function(){
       sails.get('/socketMethods/subscribers', function(req, res){
-        return res.send();
+        var idsOfRoomMembers = sails.sockets.subscribers('winterfell');
+        return res.send(idsOfRoomMembers);
       });
     });
-    it('should not crash', function (done){
+
+    // Look up the socket ids for each Stark
+    var starkSocketIds = {};
+    before(function (done){
+      async.each(_.keys(starks), function (key, next){
+        var clientSocket = starks[key];
+
+        // Lookup socket id
+        _getSocketId(clientSocket, function (err,socketId){
+          if (err) return next(err);
+          starkSocketIds[key] = socketId;
+          return next();
+        });
+      }, function afterwards(err) {
+        if (err) return done(err);
+        done();
+      });
+    });
+
+    it('should return all members of room', function (done){
       theKing.get('/socketMethods/subscribers', function (data, jwr) {
         if (jwr.error) return done(jwr.error);
-
+        _.each(starkSocketIds, function (socketId, firstName){
+          // skip ned
+          if (firstName === 'ned') {
+            return;
+          }
+          assert(_.contains(data, socketId), ''+firstName+' should be in array returned from sails.sockets.subscribers("winterfell")');
+        });
         return done();
       });
     });
@@ -503,7 +530,7 @@ describe('low-level socket methods:', function (){
         return res.send();
       });
     });
-    it('should not crash', function (done){
+    it('should send a message to everyone (all starks AND the king)', function (done){
       theKing.post('/socketMethods/blast', function (data, jwr) {
         if (jwr.error) return done(jwr.error);
 
