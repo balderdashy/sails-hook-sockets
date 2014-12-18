@@ -49,14 +49,14 @@ describe('low-level socket methods:', function (){
     theKing = io.socket;
 
     io.socket.on('connect', function (){
-      console.log('ok, now we\'ve connected the initial socket, let\'s connect some more...');
+      // console.log('ok, now we\'ve connected the initial socket, let\'s connect some more...');
       async.each(_.keys(starks), function (key, next){
-        console.log('connecting socket for %s',key);
+        // console.log('connecting socket for %s',key);
         starks[key] = io.sails.connect('http://localhost:'+TEST_SERVER_PORT, {
           multiplex: false
         });
         starks[key].on('connect', function(){
-          console.log('socket for %s connected!', key);
+          // console.log('socket for %s connected!', key);
           next();
         });
       }, done);
@@ -381,7 +381,7 @@ describe('low-level socket methods:', function (){
       });
     });
 
-    before(function (err){
+    before(function (done){
 
       // Look up the socket ids for each Stark
       var starkSocketIds = {};
@@ -425,7 +425,7 @@ describe('low-level socket methods:', function (){
             return memo;
           }, []);
           starks.ned.post('/socketMethods/emit', {
-            recipients: starkSocketIds,
+            recipients: arrayOfLivingStarkSocketIds,
             data: 'hello children'
           }, function (data, jwr){
             if (jwr.error) return done(jwr.error);
@@ -444,19 +444,24 @@ describe('low-level socket methods:', function (){
     describe('living starks', function (){
       it('should have received 1 "otherwordly" msg', function(){
         _.each(starks, function (clientSocket, firstName) {
-          assert.equal(clientSocket._otherworldlyMsgsReceived, (_.keys(starks).length-1), 'expected '+(_.keys(starks).length-1)+' "otherworldly" message for '+firstName+', but got '+clientSocket._otherworldlyMsgsReceived.length);
+          // (skip ned)
+          if (firstName === 'ned') {
+            return;
+          }
+          assert.equal(clientSocket._otherworldlyMsgsReceived.length, 1, 'expected '+(_.keys(starks).length-1)+' "otherworldly" message for '+firstName+', but got '+clientSocket._otherworldlyMsgsReceived.length);
         });
       });
     });
     describe('ned', function (){
       it('should have received many "otherwordly" msgs', function(){
-        assert.equal(starks.ned._otherworldlyMsgsReceived, (_.keys(starks).length-1), 'expected '+(_.keys(starks).length-1)+' "otherworldly" message for Ned, but got '+starks.ned._otherworldlyMsgsReceived.length);
+        assert.equal(starks.ned._otherworldlyMsgsReceived.length, (_.keys(starks).length-1), 'expected '+(_.keys(starks).length-1)+' "otherworldly" messages for Ned, but got '+starks.ned._otherworldlyMsgsReceived.length);
       });
     });
   });
 
 
 
+  ////////////////////// TODO //////////////////////////////////////////////////////
 
   describe('sails.sockets.rooms()', function (done){
     before(function(){
