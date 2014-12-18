@@ -524,17 +524,41 @@ describe('low-level socket methods:', function (){
   });
 
 
-  describe('sails.sockets.blast()', function (done){
+  describe('sails.sockets.blast()', function (){
     before(function(){
+
+      // Have the king and all starks listen for the dark mark
+      var socketsWhoListenTotheDarkmark = [theKing].concat(_.values(starks));
+      // console.log('sockets lisening for the darkmark:', socketsWhoListenTotheDarkmark);
+      _.each(socketsWhoListenTotheDarkmark, function (clientSocket, firstName){
+        clientSocket.on('darkmark', function (event){
+          clientSocket._darkmarkMsgReceived = clientSocket._darkmarkMsgReceived || [];
+          clientSocket._darkmarkMsgReceived.push(event);
+        });
+      });
+
       sails.post('/socketMethods/blast', function(req, res){
+        sails.sockets.blast('darkmark', {
+          stuff: 'yeah'
+        });
         return res.send();
       });
     });
-    it('should send a message to everyone (all starks AND the king)', function (done){
+
+    it('should send a message to everyone (all starks)', function (done){
       theKing.post('/socketMethods/blast', function (data, jwr) {
         if (jwr.error) return done(jwr.error);
 
-        return done();
+        // Wait a moment to give the sockets time to receive the msg
+        setTimeout(function (){
+          assert.equal(starks.ned._darkmarkMsgReceived.length, 1, 'expected Ned to receive 1 "darkmark" message, but got '+util.inspect(starks.ned._darkmarkMsgReceived, false, null));
+          assert.equal(starks.bran._darkmarkMsgReceived.length, 1, 'expected bran to receive 1 "darkmark" message, but got '+util.inspect(starks.bran._darkmarkMsgReceived, false, null));
+          assert.equal(starks.ricket._darkmarkMsgReceived.length, 1, 'expected ricket to receive 1 "darkmark" message, but got '+util.inspect(starks.ricket._darkmarkMsgReceived, false, null));
+          assert.equal(starks.arya._darkmarkMsgReceived.length, 1, 'expected arya to receive 1 "darkmark" message, but got '+util.inspect(starks.arya._darkmarkMsgReceived, false, null));
+          assert.equal(starks.sansa._darkmarkMsgReceived.length, 1, 'expected sansa to receive 1 "darkmark" message, but got '+util.inspect(starks.sansa._darkmarkMsgReceived, false, null));
+          return done();
+        }, 500);
+
       });
     });
   });
