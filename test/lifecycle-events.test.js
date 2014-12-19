@@ -96,6 +96,7 @@ describe('lifecycle events', function (){
   });
 
   describe('when a socket is disconnected', function (){
+
     it('should trigger onDisconnect lifecycle event', function (done){
       newSocket.on('disconnect', function (){
         // Wait for a little while to make sure the server had time to actually
@@ -128,5 +129,7 @@ describe('lifecycle events', function (){
       return done();
     });
   });
+
+
 
 });

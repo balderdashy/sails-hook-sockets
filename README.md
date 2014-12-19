@@ -23,11 +23,13 @@ This hook's responsibilities are:
 N/A
 
 ###### `after`
-N/A
+
++ `GET __getcookie`
 
 
 #### Expose on the `sails` app object:
-N/A
+
++ `sails.sockets.*` (see reference documentation for sails.sockets on sailsjs.org for full list of exposed methods)
 
 ## FAQ
 
