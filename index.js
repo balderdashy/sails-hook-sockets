@@ -2,6 +2,7 @@
  * Module dependencies
  */
 
+var _ = require('lodash');
 var ERRORPACK = require('./lib/errors');
 
 
