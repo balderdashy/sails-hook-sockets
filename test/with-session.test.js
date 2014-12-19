@@ -4,6 +4,8 @@
 
 var assert = require('assert');
 
+
+
 describe('with session', function (){
 
   before(function _setupRoutes(){
@@ -19,6 +21,25 @@ describe('with session', function (){
     sails.router.bind('GET /me', function (req, res){
       res.send(req.session.me);
     });
+  });
+
+
+  // Connect a second socket
+  var secondSocket;
+  before(function (done){
+
+    // Use a weird port to avoid tests failing if we
+    // forget to shut down another Sails app
+    var TEST_SERVER_PORT = 1577;
+
+    secondSocket = io.sails.connect('http://localhost:'+TEST_SERVER_PORT, {
+      multiplex: false
+    });
+    secondSocket.on('connect', function(){ done(); });
+  });
+
+  after(function (){
+    secondSocket.disconnect();
   });
 
 
@@ -45,6 +66,8 @@ describe('with session', function (){
     });
 
   });
+
+
 });
 
 
