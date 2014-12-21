@@ -26,7 +26,7 @@ module.exports = function createErrorpack (definition){
   return _.reduce(definition.errors||{}, function eachErrorType(memo, opts, origCode){
     memo[origCode] = createErrorFactory(_.extend({},opts,{
       code: origCode,
-      prefix: definition.namespace + '_'
+      prefix: definition.namespace + ':'
     }));
     return memo;
   }, new Errorpack());
