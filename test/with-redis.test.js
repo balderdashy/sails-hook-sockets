@@ -31,7 +31,13 @@ describe('with redis', function (){
 
     // Configure the socket.io-redis adapter
     sockets: {
-      adapter: SocketIORedisAdapter
+      adapter: 'socket.io-redis',
+      adapterModule: SocketIORedisAdapter,
+
+      // Uncomment to test advanced redis config:
+      // (will cause sockets hook to build raw redis clients)
+      // pass: 'abc123',
+      // db: 'sails'
     },
 
     routes: {
