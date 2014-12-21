@@ -9,7 +9,7 @@ var async = require('async');
 var Sails = require('sails').Sails;
 var socketioClient = require('socket.io-client');
 var sailsioClient = require('sails.io.js');
-// var SocketIORedisAdapter = require('socket.io-redis');
+var SocketIORedisAdapter = require('socket.io-redis');
 
 // TODO:
 // figure out how to make this run on Travis
@@ -21,11 +21,19 @@ describe('with redis', function (){
   // Common app config
   var appConfig = {
     log: { level: 'warn' },
+
     hooks: {
       // Inject the sockets hook in this repo into this Sails app
       sockets: require('../')
     },
+
     loadHooks: ['moduleloader', 'userconfig', 'http', 'sockets'],
+
+    // Configure the socket.io-redis adapter
+    sockets: {
+      adapter: SocketIORedisAdapter
+    },
+
     routes: {
       // A test route which joins a room
       'PUT /testroom/join': function (req, res){
