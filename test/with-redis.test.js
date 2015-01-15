@@ -36,7 +36,7 @@ describe('with redis', function (){
 
       // Uncomment to test advanced redis config:
       // (will cause sockets hook to build raw redis clients)
-      // pass: 'abc123',
+      pass: 'secret',
       // db: 'sails'
     },
 
