@@ -34,8 +34,12 @@ describe('with redis', function (){
       adapter: 'socket.io-redis',
       adapterModule: SocketIORedisAdapter,
 
-      // Uncomment to test advanced redis config:
-      // (will cause sockets hook to build raw redis clients)
+      // Configure port to match .travis.yml
+      port: 1680,
+
+      // Test advanced redis config: (will cause sockets hook to build raw redis clients):
+      //
+      // Configure password to match .travis.yml
       pass: 'secret',
       // db: 'sails'
     },
