@@ -35,7 +35,7 @@ describe('with redis', function (){
       adapterModule: SocketIORedisAdapter,
 
       // Configure port to match .travis.yml
-      port: 6380,
+      port: 6379,
 
       // Test advanced redis config: (will cause sockets hook to build raw redis clients):
       //
@@ -150,5 +150,79 @@ describe('with redis', function (){
 
   });
 
+
+});
+
+
+
+
+
+describe('with redis', function (){
+
+  // Common app config
+  var appConfig = {
+    log: { level: 'warn' },
+
+    globals: false,
+
+    hooks: {
+      // Inject the sockets hook in this repo into this Sails app
+      sockets: require('../')
+    },
+
+    loadHooks: ['moduleloader', 'userconfig', 'http', 'sockets'],
+
+    // Configure the socket.io-redis adapter
+    sockets: {
+      adapter: 'socket.io-redis',
+      adapterModule: SocketIORedisAdapter,
+
+      // Configure port to match .travis.yml
+      // port: 6379,
+
+      // Test advanced redis config: (will cause sockets hook to build raw redis clients):
+      url: 'redis://:secret@localhost:6380'
+      // Configure password to match .travis.yml
+      // pass: 'secret',
+      // db: 'sails'
+    },
+
+    routes: {
+      // A test route which joins a room
+      'PUT /testroom/join': function (req, res){
+        req._sails.sockets.join(req, 'testroom');
+        return res.send();
+      },
+
+      // A test route which broadcasts a message to a room
+      'POST /testroom/broadcast': function (req, res){
+        req._sails.sockets.broadcast('testroom', {msg: 'HI! HI HI! HI HI!'});
+        return res.send();
+      }
+    }
+  };
+
+  // New up five instances of Sails which share the config above
+  // and lift all of them (only difference is their port)
+  var apps = [];
+  var ports = [1600, 1601, 1602, 1603, 1604];
+  before(function (done){
+    async.each(ports, function (port, next){
+      var app = Sails();
+      apps.push(app);
+      app.lift(_.extend(appConfig, {port: port}),next);
+    }, done);
+  });
+  after(function (done){
+    async.each(apps, function (app, next){
+      app.lower(next);
+    }, done);
+  });
+
+  describe('with redis url', function (){
+    it('should let you connect', function (){
+      // ok.
+    });
+  });
 
 });
