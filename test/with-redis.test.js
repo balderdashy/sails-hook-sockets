@@ -35,7 +35,7 @@ describe('with redis', function (){
       adapterModule: SocketIORedisAdapter,
 
       // Configure port to match .travis.yml
-      port: 6379,
+      port: 6380,
 
       // Test advanced redis config: (will cause sockets hook to build raw redis clients):
       //
