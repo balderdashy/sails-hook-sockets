@@ -84,6 +84,8 @@ describe('with redis', function (){
       before(function (done){
         async.each(apps, function (app, next){
           var socket = io.sails.connect('http://localhost:'+app.config.port, {
+            // This prevents multiple socket.io clients attempting to share
+            // the same global socket (which would render this test meaningless)
             multiplex: false
           });
           sockets.push(socket);
