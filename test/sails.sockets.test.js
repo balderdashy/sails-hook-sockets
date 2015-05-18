@@ -429,7 +429,7 @@ describe('low-level socket methods:', function (){
           if (err) return done(err);
 
           // Now have ricket (or whatever his name is) send a generic message to ned
-          starks.ricket.post('/', {
+          starks.ricket.post('/socketMethods/emit', {
             recipients: starkSocketIds.ned,
             data: 'hi pops!'
           }, function (data, jwr){
