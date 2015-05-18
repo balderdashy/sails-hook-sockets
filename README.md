@@ -52,6 +52,40 @@ Yes.
 Yes, see the [v0.11 migration guide](http://sailsjs.org/#/documentation/concepts/Upgrading). You probably won't need to change anything unless you were extensively using the old Socket.io v0.9 configuration.
 
 
+## Running the tests
+
+First, clone this repo, cd into it, and install dependencies:
+
+```sh
+git clone https://github.com/balderdashy/sails-hook-sockets.git
+cd sails-hook-sockets
+npm install
+```
+
+#### Run them all
+
+To run all the tests, start a local redis server on port 6380 and then run the tests using mocha:
+
+```sh
+redis-server --port 6380
+npm test
+```
+
+
+#### Run only certain tests
+
+Alternatively, you can run a particular set of tests with:
+
+```sh
+node ./node_modules/mocha/bin/mocha -g 'without session'
+```
+
+> (this may be useful if you don't want to wait for all the tests to run, or e.g. if you aren't able to install a redis server locally.  However please make sure all the tests pass before submitting a PR.)
+
+
+
+
+
 ## License
 
 MIT
