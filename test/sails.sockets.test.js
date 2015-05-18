@@ -376,6 +376,10 @@ describe('low-level socket methods:', function (){
   describe('sails.sockets.emit()', function (done){
     before(function(){
       sails.post('/socketMethods/emit', function(req, res){
+        sails.sockets.emit(req.param('recipients'), undefined, req.param('data'));
+        return res.send();
+      });
+      sails.post('/socketMethods/emit/otherworldly', function(req, res){
         sails.sockets.emit(req.param('recipients'), 'otherworldly', req.param('data'));
         return res.send();
       });
@@ -394,6 +398,12 @@ describe('low-level socket methods:', function (){
           clientSocket._otherworldlyMsgsReceived.push(event);
         });
 
+        // Listen for the "message" event type
+        clientSocket.on('message', function(event){
+          clientSocket._genericMsgsReceived = clientSocket._genericMsgsReceived || [];
+          clientSocket._genericMsgsReceived.push(event);
+        });
+
         // Lookup socket id
         _getSocketId(clientSocket, function (err,socketId){
           if (err) return next(err);
@@ -408,7 +418,7 @@ describe('low-level socket methods:', function (){
           // (skip ned)
           if (firstName === 'ned') return next();
 
-          starks[firstName].post('/socketMethods/emit', {
+          starks[firstName].post('/socketMethods/emit/otherworldly', {
             recipients: starkSocketIds.ned,
             data: 'hi pops!'
           }, function (data, jwr){
@@ -418,19 +428,27 @@ describe('low-level socket methods:', function (){
         }, function (err){
           if (err) return done(err);
 
-
-          // Now have Ned emit a message back addressing everyone else
-          var arrayOfLivingStarkSocketIds = _.reduce(starkSocketIds, function (memo, socketId, firstName){
-            if (firstName !== 'ned') memo.push(socketId);
-            return memo;
-          }, []);
-          starks.ned.post('/socketMethods/emit', {
-            recipients: arrayOfLivingStarkSocketIds,
-            data: 'hello children'
+          // Now have ricket (or whatever his name is) send a generic message to ned
+          starks.ricket.post('/', {
+            recipients: starkSocketIds.ned,
+            data: 'hi pops!'
           }, function (data, jwr){
             if (jwr.error) return done(jwr.error);
-            return done();
+
+            // Now have Ned emit a message back addressing everyone else
+            var arrayOfLivingStarkSocketIds = _.reduce(starkSocketIds, function (memo, socketId, firstName){
+              if (firstName !== 'ned') memo.push(socketId);
+              return memo;
+            }, []);
+            starks.ned.post('/socketMethods/emit/otherworldly', {
+              recipients: arrayOfLivingStarkSocketIds,
+              data: 'hello children'
+            }, function (data, jwr){
+              if (jwr.error) return done(jwr.error);
+              return done();
+            });
           });
+
         });
 
       });
@@ -455,6 +473,9 @@ describe('low-level socket methods:', function (){
     describe('ned', function (){
       it('should have received many "otherwordly" msgs', function(){
         assert.equal(starks.ned._otherworldlyMsgsReceived.length, (_.keys(starks).length-1), 'expected '+(_.keys(starks).length-1)+' "otherworldly" messages for Ned, but got '+starks.ned._otherworldlyMsgsReceived.length);
+      });
+      it('should have received one generic msg from ricket (or whatever his name is)', function(){
+        assert.equal(starks.ned._genericMsgsReceived.length, 1, 'expected 1 generic message for Ned, but got '+starks.ned._genericMsgsReceived.length);
       });
     });
   });
