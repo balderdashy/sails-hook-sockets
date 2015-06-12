@@ -95,8 +95,12 @@ describe('with redis -- bus', function (){
                 // the same global socket (which would render this test meaningless)
                 multiplex: false
               });
+              socket._receivedMessageEvents = {};
               sockets.push(socket);
               socket.on('connect', function(socket){ next(); });
+              socket.on('sails', function(data) {
+                socket._receivedMessageEvents[data.event] = true;
+              });
             }, next);
           }
         }, done);
@@ -130,6 +134,13 @@ describe('with redis -- bus', function (){
           assert(!app._receivedMessageEvents['broadcast']);
           return done();
         });
+
+        it('should not be received by any of the client sockets', function (){
+          _.each(sockets, function (socket){
+            assert(!socket._receivedMessageEvents['broadcast']);
+          });
+        });
+
 
       });
 
