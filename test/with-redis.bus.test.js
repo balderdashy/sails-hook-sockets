@@ -34,11 +34,17 @@ describe('with redis -- bus', function (){
     },
 
     routes: {
-      // A test route which broadcasts a message to a room
+      // A test route which broadcasts a message to the bus
       'POST /testroom/adminBroadcast': function (req, res){
-        req._sails.hooks.sockets.broadcastAdminMessage('testingtesting', 123);
+        req._sails.hooks.sockets.broadcastAdminMessage('broadcast', 123);
+        return res.send();
+      },
+      // A test route which blasts a message to the bus
+      'POST /testroom/adminBlast': function (req, res){
+        req._sails.hooks.sockets.blastAdminMessage('blast', 123);
         return res.send();
       }
+
     }
   };
 
@@ -68,9 +74,12 @@ describe('with redis -- bus', function (){
         async.auto({
           connectAdminSockets: function(next) {
             async.each(apps, function (app, next){
-              app.on('hook:sockets:adminMessage', function (event){
-                app._receivedMessageEvents = app._receivedMessageEvents || [];
-                app._receivedMessageEvents.push(event);
+              app._receivedMessageEvents = {};
+              app.on('hook:sockets:adminMessage', function (data){
+                var event = data.event;
+                var payload = data.payload;
+                app._receivedMessageEvents[event] = app._receivedMessageEvents[event] || [];
+                app._receivedMessageEvents[event].push(payload);
               });
               app.hooks.sockets.adminSocket.on('connect', next);
             }, next);
@@ -86,13 +95,7 @@ describe('with redis -- bus', function (){
               socket.on('connect', function(socket){ next(); });
             }, next);
           }
-        }, function() {
-          var oneSocket = sockets[0];
-          oneSocket.post('/testroom/adminBroadcast', function (data, jwr){
-            if (jwr.error) return done(jwr.error);
-            return done();
-          });
-        });
+        }, done);
       });
       after(function (done){
         async.each(sockets, function (socket, next){
@@ -101,13 +104,49 @@ describe('with redis -- bus', function (){
         }, done);
       });
 
-      it('all other connected apps should receive the message', function (done){
-        _.each(apps, function (app){
-          if (app.config.port == sockets[0].port) {return;}
-          assert(app._receivedMessageEvents && app._receivedMessageEvents.length == 1, util.format('App connected on port %d did not receive the message', app.config.port));
+      describe('a message broadcast to the bus', function() {
+        before(function(done) {
+          var oneSocket = sockets[0];
+          oneSocket.post('/testroom/adminBroadcast', function (data, jwr){
+            if (jwr.error) return done(jwr.error);
+            return done();
+          });
         });
-        return done();
+
+        it('should be received by all other connected apps', function (done){
+          _.each(apps, function (app){
+            if (app.config.port == sockets[0].port) {return;}
+            assert(app._receivedMessageEvents['broadcast'] && app._receivedMessageEvents['broadcast'].length == 1, util.format('App connected on port %d did not receive the message', app.config.port));
+          });
+          return done();
+        });
+
+        it('should not be received by the sender', function (done){
+          var app = _.find(apps, function(app) {return app.config.port == sockets[0].port;});
+          assert(!app._receivedMessageEvents['broadcast']);
+          return done();
+        });
+
       });
+
+      describe('a message blasted to the bus', function() {
+        before(function(done) {
+          var oneSocket = sockets[0];
+          oneSocket.post('/testroom/adminBlast', function (data, jwr){
+            if (jwr.error) return done(jwr.error);
+            return done();
+          });
+        });
+
+        it('should be received by all connected apps', function (done){
+          _.each(apps, function (app){
+            assert(app._receivedMessageEvents['blast'] && app._receivedMessageEvents['blast'].length == 1, util.format('App connected on port %d did not receive the message', app.config.port));
+          });
+          return done();
+        });
+
+      });
+
 
     });
 
