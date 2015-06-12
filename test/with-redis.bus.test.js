@@ -30,7 +30,11 @@ describe('with redis -- bus', function (){
       adapterModule: SocketIORedisAdapter,
 
       // Configure port to match .travis.yml
-      port: 6380
+      port: 6380,
+
+      // Configure password to match .travis.yml
+      pass: 'secret',
+
     },
 
     routes: {
