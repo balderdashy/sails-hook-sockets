@@ -12,7 +12,8 @@
     "socket.io": "^1.2.1",
     "semver": "^4.3.4",
     "lodash": "^2.4.1",
-    "machinepack-urls": "^3.1.1"
+    "machinepack-urls": "^3.1.1",
+    "socket.io-client": "^1.2.1"
   },
   "devDependencies": {
     "async": "^0.9.0",
@@ -21,7 +22,6 @@
     "mocha": "^2.2.4",
     "sails": "0.11.0",
     "sails.io.js": "^0.11.5",
-    "socket.io-client": "^1.2.1",
     "socket.io-redis": "^0.1.4"
   },
   "scripts": {
