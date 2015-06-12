@@ -81,7 +81,7 @@ describe('with redis -- bus', function (){
                 app._receivedMessageEvents[event] = app._receivedMessageEvents[event] || [];
                 app._receivedMessageEvents[event].push(payload);
               });
-              app.hooks.sockets.adminSocket.on('connect', next);
+              app.once('hook:sockets:adminSocketConnected', next);
             }, next);
           },
           connectClientSockets: function(next) {
