@@ -31,7 +31,9 @@ module.exports = function (app){
         }
 
       }
-    }
+    },
+
+    broadcastAdminMessage: require('./lib/broadcast-admin-message')(app)
 
   };
 };
