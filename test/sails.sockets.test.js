@@ -262,6 +262,11 @@ describe('low-level socket methods:', function (){
         });
       });
     });
+    it('should warn and not error if passing in null socket', function(done) {
+      // Testing fix for #6
+      sails.sockets.leave(null);
+      done();
+    });
   });
 
 
@@ -610,4 +615,3 @@ function _getSocketId(clientSocket, cb){
     return cb(null, jwr.body);
   });
 }
-
