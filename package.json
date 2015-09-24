@@ -25,7 +25,9 @@
     "socket.io-redis": "^0.1.4"
   },
   "scripts": {
-    "test": "node ./node_modules/mocha/bin/mocha --timeout 5000"
+    "test": "node ./node_modules/mocha/bin/mocha --timeout 5000",
+    "docker-test": "docker-compose up # runs `npm test` inside a docker container",
+    "docker-install": "docker-compose run hook npm install # runs `npm install` inside the container"
   },
   "main": "index.js",
   "repository": {

@@ -1,0 +1,17 @@
+# Run tests in Docker `docker-compose up` on node latest
+# - install node deps first `docker-compose run hook npm install`
+hook:
+  image: node:latest
+  command: npm test
+  volumes:
+    - ./:/usr/src/app
+  working_dir: /usr/src/app
+  environment:
+    - REDIS_HOST=redis
+  links:
+    - redis
+
+redis:
+  image: redis:latest
+  ports:
+    - "6379"
