@@ -42,9 +42,10 @@ describe('lifecycle events', function (){
           numTimesOnConnectTriggered++;
           onConnectArgs = Array.prototype.slice.call(arguments);
         },
-        onDisconnect: function (session, socket) {
+        afterDisconnect: function (session, socket, cb) {
           numTimesOnDisconnectTriggered++;
           onDisconnectArgs = Array.prototype.slice.call(arguments);
+          return cb();
         }
       }
     },function (err) {
