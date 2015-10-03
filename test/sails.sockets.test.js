@@ -123,7 +123,47 @@ describe('low-level socket methods:', function (){
         return done();
       });
     });
+  });
 
+  describe('sails.sockets.validate()', function(done){
+    it('should throw USAGE error when called w/ no arguments', function (){
+      assert.throws(function (){
+        sails.sockets.validate();
+      }, ERRORPACK.USAGE.constructor);
+    });
+
+    it('should throw USAGE error when called w/ invalid socket id', function (){
+      assert.throws(function (){
+        sails.sockets.validate([
+          {
+            something:'totally invalid'
+          }
+        ]);
+      }, ERRORPACK.USAGE.constructor);
+    });
+
+    it('should return false when called w/ an invalid socket id', function (done){
+      var status = sails.sockets.validate(7);
+      try {
+        assert(!status,'expected status to be false');
+      } catch (e) {
+        return done(e);
+      }
+      return done();
+    });
+
+    it('should return true when called w/ a valid socket id', function (done){
+      _getSocketId(theKing, function (err, socketId) {
+        if (err) return done(err);
+        var status = sails.sockets.validate(socketId);
+        try {
+          assert(status,'expected status to be true');
+        } catch (e) {
+          return done(e);
+        }
+        return done();
+      });
+    });
   });
 
 
