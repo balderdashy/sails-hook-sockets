@@ -1,6 +1,6 @@
 {
   "name": "sails-hook-sockets",
-  "version": "0.11.27",
+  "version": "0.11.28",
   "description": "Implements socket.io support in Sails",
   "keywords": [
     "socket.io",
