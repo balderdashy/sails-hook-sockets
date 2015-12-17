@@ -20,6 +20,9 @@ module.exports = {
 
   setup: function (done) {
 
+    // prevent async from maxing out EventEmitter's max listeners, defaults to 10
+    process.EventEmitter.defaultMaxListeners = 0;
+
     // New up an instance of Sails and lift it.
     var app = Sails();
 

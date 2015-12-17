@@ -33,15 +33,7 @@ describe('with redis', function (){
     sockets: {
       adapter: 'socket.io-redis',
       adapterModule: SocketIORedisAdapter,
-
-      // Configure port to match .travis.yml
-      port: 6380,
-
-      // Test advanced redis config: (will cause sockets hook to build raw redis clients):
-      //
-      // Configure password to match .travis.yml
-      pass: 'secret',
-      // db: 'sails'
+      host: process.env.REDIS_HOST || 'localhost'
     },
 
     routes: {
@@ -159,7 +151,7 @@ describe('with redis', function (){
 
 
 
-describe('with redis', function (){
+describe('with redis (raw client)', function (){
 
   // Common app config
   var appConfig = {
@@ -178,15 +170,8 @@ describe('with redis', function (){
     sockets: {
       adapter: 'socket.io-redis',
       adapterModule: SocketIORedisAdapter,
-
-      // Configure port to match .travis.yml
-      // port: 6379,
-
       // Test advanced redis config: (will cause sockets hook to build raw redis clients):
-      url: 'redis://:secret@localhost:6380'
-      // Configure password to match .travis.yml
-      // pass: 'secret',
-      // db: 'sails'
+      url: 'redis://:@' + (process.env.REDIS_HOST || 'localhost') + ':6379'
     },
 
     routes: {

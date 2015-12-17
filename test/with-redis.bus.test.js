@@ -28,13 +28,7 @@ describe('with redis -- bus', function (){
     sockets: {
       adapter: 'socket.io-redis',
       adapterModule: SocketIORedisAdapter,
-
-      // Configure port to match .travis.yml
-      port: 6380,
-
-      // Configure password to match .travis.yml
-      pass: 'secret',
-
+      host: process.env.REDIS_HOST || 'localhost'
     },
 
     routes: {
@@ -48,7 +42,6 @@ describe('with redis -- bus', function (){
         req._sails.hooks.sockets.blastAdminMessage('blast', 123);
         return res.send();
       }
-
     }
   };
 
