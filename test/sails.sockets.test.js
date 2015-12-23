@@ -378,14 +378,14 @@ describe('low-level socket methods:', function (){
 
 
 
-  describe('sails.sockets.emit()', function (done){
+  describe('sails.sockets.emitToAll()', function (done){
     before(function(){
       sails.post('/socketMethods/emit', function(req, res){
-        sails.sockets.emit(req.param('recipients'), undefined, req.param('data'));
+        sails.sockets.emitToAll(req.param('recipients'), undefined, req.param('data'));
         return res.send();
       });
       sails.post('/socketMethods/emit/otherworldly', function(req, res){
-        sails.sockets.emit(req.param('recipients'), 'otherworldly', req.param('data'));
+        sails.sockets.emitToAll(req.param('recipients'), 'otherworldly', req.param('data'));
         return res.send();
       });
     });
@@ -483,9 +483,69 @@ describe('low-level socket methods:', function (){
         assert.equal(starks.ned._genericMsgsReceived.length, 1, 'expected 1 generic message for Ned, but got '+starks.ned._genericMsgsReceived.length);
       });
     });
+
+    describe('sending messages to several socket IDs, some of which are not valid', function() {
+      it('should result in a dictionary showing which messages were successfully sent', function(done) {
+        var socketIds = ['foobar'];
+        _getSocketId(starks.ned, function (err,nedSocketId){
+          if (err) return done(err);
+          socketIds.push(nedSocketId);
+          var result = sails.sockets.emitToAll(socketIds);
+          assert.equal(result[nedSocketId], true);
+          assert.equal(result.foobar, false);
+          return done();
+        });
+      });
+    });
   });
 
+  describe('sails.sockets.emit()', function() {
 
+    var nedSocketId;
+    var gotMessageFn;
+    before(function(done) {
+      _getSocketId(starks.ned, function (err,_nedSocketId){
+        if (err) return done(err);
+        nedSocketId = _nedSocketId;
+        starks.ned.on('news', function(data){gotMessageFn(data);});
+        return done();
+      });
+    });
+
+    it('Sending a message to a valid socket ID should be successful', function(done) {
+      gotMessageFn = function(data) {
+        assert(data == 'holla!');
+        return done();
+      };
+      sails.sockets.emit(nedSocketId, 'news', 'holla!');
+    });
+
+    it('Sending a message to an invalid socket ID should throw an error', function() {
+      try {
+        sails.sockets.emit('foobar', 'news', 'holla!');
+      } catch(e) {
+        assert.equal(e.code, 'SAILS:HOOK:SOCKETS:NO_SUCH_SOCKET', 'An error was thrown, but it had the wrong code (' + e.code + ')');
+        return;
+      }
+      throw new Error('sails.sockets.emit() with an invalid socket ID should throw an error!');
+    });
+
+    it('Using an array as the first argument of .emit() should work, but show a deprecation warning', function() {
+      var origWarn = sails.log.warn;
+      var sawWarning = false;
+      sails.log.warn = function(msg) {
+        sawWarning = true;
+        origWarn.apply(this, arguments);
+      };
+      starks.ned.removeAllListeners();
+      var result = sails.sockets.emit(['foobar', nedSocketId], 'news', 'holla!');
+      sails.log.warn = origWarn;
+      assert.equal(result.foobar, false);
+      assert.equal(result[nedSocketId], true);
+      assert.equal(sawWarning, true);
+    });
+
+  });
 
   describe('sails.sockets.rooms()', function (done){
     before(function(){
