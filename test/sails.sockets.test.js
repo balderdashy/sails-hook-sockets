@@ -202,7 +202,7 @@ describe('low-level socket methods:', function (){
         // console.log('socket %s checking room membership...', sails.sockets.id(req.socket));
         var result1 = sails.sockets.socketRooms(req.socket);
         var result2 = sails.sockets.socketRooms(req);
-        assert.equal(result2, result1);
+        assert(_.isEqual(result2, result1));
         return res.send(result1);
       });
     });

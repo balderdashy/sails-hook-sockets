@@ -55,7 +55,7 @@ describe('with redis -- bus', function (){
   // New up five instances of Sails which share the config above
   // and lift all of them (only difference is their port)
   var apps = [];
-  var ports = [1600, 1601, 1602, 1603, 1604];
+  var ports = [1500, 1501, 1502, 1503, 1504];
   before(function (done){
     async.each(ports, function (port, next){
       var app = Sails();
