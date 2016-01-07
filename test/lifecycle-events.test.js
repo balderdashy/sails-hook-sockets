@@ -38,9 +38,10 @@ describe('lifecycle events', function (){
       },
       loadHooks: ['moduleloader', 'userconfig', 'http', 'session', 'sockets'],
       sockets: {
-        onConnect: function (session, socket) {
+        beforeConnect: function (handshake, cb) {
           numTimesOnConnectTriggered++;
           onConnectArgs = Array.prototype.slice.call(arguments);
+          return cb(null, true);
         },
         afterDisconnect: function (session, socket, cb) {
           numTimesOnDisconnectTriggered++;
