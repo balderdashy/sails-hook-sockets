@@ -47,8 +47,9 @@ describe('with redis', function (){
     routes: {
       // A test route which joins a room
       'PUT /testroom/join': function (req, res){
-        req._sails.sockets.join(req, 'testroom');
-        return res.send();
+        req._sails.sockets.join(req, 'testroom', function() {
+          res.send();
+        });
       },
 
       // A test route which broadcasts a message to a room
@@ -114,7 +115,7 @@ describe('with redis', function (){
 
       describe('when all sockets join a room and listen for the `message` event', function (){
 
-        before(function (){
+        before(function (done){
           async.each(sockets, function (socket, next){
             socket.on('message', function (event){
               socket._receivedMessageEvents = socket._receivedMessageEvents || [];
@@ -124,14 +125,13 @@ describe('with redis', function (){
               if (jwr.error) return next(jwr.error);
               return next();
             });
-          });
+          }, done);
         });
 
         describe('and then one socket broadcasts a message', function (){
 
           before(function (done){
             var oneSocket = sockets[0];
-            // console.log('broadcasting from socket on port %d', oneSocket.port);
             oneSocket.post('/testroom/broadcast', function (data, jwr){
               if (jwr.error) return done(jwr.error);
               return done();
