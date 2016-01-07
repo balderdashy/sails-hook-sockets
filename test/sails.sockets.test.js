@@ -264,7 +264,14 @@ describe('low-level socket methods:', function (){
     });
     it('should warn and not error if passing in null socket', function(done) {
       // Testing fix for #6
+      var origWarn = sails.log.warn;
+      var sawWarning = false;
+      sails.log.warn = function(msg) {
+        sawWarning = true;
+        origWarn.apply(this, arguments);
+      };
       sails.sockets.leave(null);
+      assert.equal(sawWarning, true);
       done();
     });
   });
