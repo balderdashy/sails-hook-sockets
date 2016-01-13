@@ -126,18 +126,49 @@ describe('low-level socket methods:', function (){
 
   });
 
+  describe('sails.sockets.id()', function() {
 
-  describe('sails.sockets.id()', function (done){
+    var actualSocketId, sawWarning = false;
+
+    before(function (){
+      sails.get('/socketMethods/sails.sockets.id', function (req, res){
+        var origWarn = sails.log.warn;
+        sails.log.warn = function(msg) {
+          sawWarning = true;
+          origWarn.apply(this, arguments);
+          sails.log.warn = origWarn;
+        };
+        actualSocketId = req.socket.id;
+        var socketId = sails.sockets.id(req.socket);
+        return res.send(socketId);
+      });
+    });
+
+    it('should return the proper socket id', function (done){
+      theKing.get('/socketMethods/sails.sockets.id', function (data, jwr){
+        if (jwr.error) return done(jwr.error);
+        assert.equal(data, actualSocketId, 'should have returned the proper socketId ('+actualSocketId+'), but instead got:'+data);
+        return done();
+      });
+    });
+
+    it('should show a deprecation warning', function() {
+      assert(sawWarning);
+    });
+
+  });
+
+  describe('sails.sockets.getId()', function (done){
 
     var actualSocketId;
     before(function (){
-      sails.get('/socketMethods/sails.sockets.id', function (req, res){
+      sails.get('/socketMethods/sails.sockets.getid', function (req, res){
         actualSocketId = req.socket.id;
 
-        var result1 = sails.sockets.id(req.socket);
+        var result1 = sails.sockets.getId(req.socket);
         assert.equal(result1, actualSocketId);
 
-        var result2 = sails.sockets.id(req);
+        var result2 = sails.sockets.getId(req);
         assert.equal(result2, result1);
 
         return res.send(result1);
@@ -145,14 +176,14 @@ describe('low-level socket methods:', function (){
     });
 
     it('should not crash or throw', function (done){
-      theKing.get('/socketMethods/sails.sockets.id', function (data, jwr){
+      theKing.get('/socketMethods/sails.sockets.getid', function (data, jwr){
         if (jwr.error) return done(jwr.error);
         return done();
       });
     });
 
     it('should return a string', function (done){
-      theKing.get('/socketMethods/sails.sockets.id', function (data, jwr){
+      theKing.get('/socketMethods/sails.sockets.getid', function (data, jwr){
         if (jwr.error) return done(jwr.error);
         assert(typeof data === 'string', 'should have returned a string, but instead got:'+data);
         return done();
@@ -160,7 +191,7 @@ describe('low-level socket methods:', function (){
     });
 
     it('should return the proper socket id', function (done){
-      theKing.get('/socketMethods/sails.sockets.id', function (data, jwr){
+      theKing.get('/socketMethods/sails.sockets.getid', function (data, jwr){
         if (jwr.error) return done(jwr.error);
         assert.equal(data, actualSocketId, 'should have returned the proper socketId ('+actualSocketId+'), but instead got:'+data);
         return done();
@@ -269,6 +300,7 @@ describe('low-level socket methods:', function (){
       sails.log.warn = function(msg) {
         sawWarning = true;
         origWarn.apply(this, arguments);
+        sails.log.warn = origWarn;
       };
       sails.sockets.leave(null);
       assert.equal(sawWarning, true);
@@ -385,14 +417,14 @@ describe('low-level socket methods:', function (){
 
 
 
-  describe('sails.sockets.emitToAll()', function (done){
+  describe('sails.sockets.broadcast() to socket rooms', function (done){
     before(function(){
-      sails.post('/socketMethods/emit', function(req, res){
-        sails.sockets.emitToAll(req.param('recipients'), undefined, req.param('data'));
+      sails.post('/socketMethods/broadcastToSocketd', function(req, res){
+        sails.sockets.broadcast(req.param('recipients'), undefined, req.param('data'));
         return res.send();
       });
-      sails.post('/socketMethods/emit/otherworldly', function(req, res){
-        sails.sockets.emitToAll(req.param('recipients'), 'otherworldly', req.param('data'));
+      sails.post('/socketMethods/broadcastToSocketd/otherworldly', function(req, res){
+        sails.sockets.broadcast(req.param('recipients'), 'otherworldly', req.param('data'));
         return res.send();
       });
     });
@@ -430,7 +462,7 @@ describe('low-level socket methods:', function (){
           // (skip ned)
           if (firstName === 'ned') return next();
 
-          starks[firstName].post('/socketMethods/emit/otherworldly', {
+          starks[firstName].post('/socketMethods/broadcastToSocketd/otherworldly', {
             recipients: starkSocketIds.ned,
             data: 'hi pops!'
           }, function (data, jwr){
@@ -441,7 +473,7 @@ describe('low-level socket methods:', function (){
           if (err) return done(err);
 
           // Now have ricket (or whatever his name is) send a generic message to ned
-          starks.ricket.post('/socketMethods/emit', {
+          starks.ricket.post('/socketMethods/broadcastToSocketd', {
             recipients: starkSocketIds.ned,
             data: 'hi pops!'
           }, function (data, jwr){
@@ -452,7 +484,7 @@ describe('low-level socket methods:', function (){
               if (firstName !== 'ned') memo.push(socketId);
               return memo;
             }, []);
-            starks.ned.post('/socketMethods/emit/otherworldly', {
+            starks.ned.post('/socketMethods/broadcastToSocketd/otherworldly', {
               recipients: arrayOfLivingStarkSocketIds,
               data: 'hello children'
             }, function (data, jwr){
@@ -491,67 +523,6 @@ describe('low-level socket methods:', function (){
       });
     });
 
-    describe('sending messages to several socket IDs, some of which are not valid', function() {
-      it('should result in a dictionary showing which messages were successfully sent', function(done) {
-        var socketIds = ['foobar'];
-        _getSocketId(starks.ned, function (err,nedSocketId){
-          if (err) return done(err);
-          socketIds.push(nedSocketId);
-          var result = sails.sockets.emitToAll(socketIds);
-          assert.equal(result[nedSocketId], true);
-          assert.equal(result.foobar, false);
-          return done();
-        });
-      });
-    });
-  });
-
-  describe('sails.sockets.emit()', function() {
-
-    var nedSocketId;
-    var gotMessageFn;
-    before(function(done) {
-      _getSocketId(starks.ned, function (err,_nedSocketId){
-        if (err) return done(err);
-        nedSocketId = _nedSocketId;
-        starks.ned.on('news', function(data){gotMessageFn(data);});
-        return done();
-      });
-    });
-
-    it('Sending a message to a valid socket ID should be successful', function(done) {
-      gotMessageFn = function(data) {
-        assert(data == 'holla!');
-        return done();
-      };
-      sails.sockets.emit(nedSocketId, 'news', 'holla!');
-    });
-
-    it('Sending a message to an invalid socket ID should throw an error', function() {
-      try {
-        sails.sockets.emit('foobar', 'news', 'holla!');
-      } catch(e) {
-        assert.equal(e.code, 'SAILS:HOOK:SOCKETS:NO_SUCH_SOCKET', 'An error was thrown, but it had the wrong code (' + e.code + ')');
-        return;
-      }
-      throw new Error('sails.sockets.emit() with an invalid socket ID should throw an error!');
-    });
-
-    it('Using an array as the first argument of .emit() should work, but show a deprecation warning', function() {
-      var origWarn = sails.log.warn;
-      var sawWarning = false;
-      sails.log.warn = function(msg) {
-        sawWarning = true;
-        origWarn.apply(this, arguments);
-      };
-      starks.ned.removeAllListeners();
-      var result = sails.sockets.emit(['foobar', nedSocketId], 'news', 'holla!');
-      sails.log.warn = origWarn;
-      assert.equal(result.foobar, false);
-      assert.equal(result[nedSocketId], true);
-      assert.equal(sawWarning, true);
-    });
-
   });
 
   describe('sails.sockets.rooms()', function (done){
@@ -572,12 +543,16 @@ describe('low-level socket methods:', function (){
     });
   });
 
-
-
-
-  describe('sails.sockets.subscribers()', function (done){
+  describe('sails.sockets.subscribers() synchronous usage', function (done){
+    var sawWarning = false;
     before(function(){
       sails.get('/socketMethods/subscribers', function(req, res){
+        var origWarn = sails.log.warn;
+        sails.log.warn = function(msg) {
+          sawWarning = true;
+          origWarn.apply(this, arguments);
+          sails.log.warn = origWarn;
+        };
         var idsOfRoomMembers = sails.sockets.subscribers('winterfell');
         return res.send(idsOfRoomMembers);
       });
@@ -614,8 +589,54 @@ describe('low-level socket methods:', function (){
         return done();
       });
     });
+
+    it('should show a deprecation warning', function() {
+      assert(sawWarning);
+    });
   });
 
+  describe('sails.sockets.subscribers() asynchronous usage', function (done){
+    before(function(){
+      sails.get('/socketMethods/subscribersAsync', function(req, res){
+        sails.sockets.subscribers('winterfell', function(err, idsOfRoomMembers) {
+          if (err) {return res.serverError(err);}
+          return res.send(idsOfRoomMembers);
+        });
+      });
+    });
+
+    // Look up the socket ids for each Stark
+    var starkSocketIds = {};
+    before(function (done){
+      async.each(_.keys(starks), function (key, next){
+        var clientSocket = starks[key];
+
+        // Lookup socket id
+        _getSocketId(clientSocket, function (err,socketId){
+          if (err) return next(err);
+          starkSocketIds[key] = socketId;
+          return next();
+        });
+      }, function afterwards(err) {
+        if (err) return done(err);
+        done();
+      });
+    });
+
+    it('should return all members of room', function (done){
+      theKing.get('/socketMethods/subscribersAsync', function (data, jwr) {
+        if (jwr.error) return done(jwr.error);
+        _.each(starkSocketIds, function (socketId, firstName){
+          // skip ned
+          if (firstName === 'ned') {
+            return;
+          }
+          assert(_.contains(data, socketId), ''+firstName+' should be in array returned from sails.sockets.subscribers("winterfell")');
+        });
+        return done();
+      });
+    });
+  });
 
   describe('sails.sockets.blast()', function (){
     before(function(){
