@@ -2,13 +2,13 @@
 
 ### 0.13.0
 
-[ENHANCEMENT] Added callback argument to `.join()`, `.leave()` and `.subscribers()`.
-[ENHANCEMENT] Added ability to broadcast to multiple rooms using `.broadcast()`.
-[DEPRECATION] Deprecated `.rooms()` method, since it uses undocumented socket.io functionality.
-[DEPRECATION] Deprecated `.emit()` and `.emitAll()` and made them aliases for `.broadcast()`.
-[DEPRECATION] Deprecated `.socketRooms()`.
-[DEPRECATION] Deprecated `.id()` (made it an alias of `.getId()`).
-[DEPRECATION] Deprecated synchronous use of `.subscribers()`.
+* [ENHANCEMENT] Added callback argument to `.join()`, `.leave()` and `.subscribers()`.
+* [ENHANCEMENT] Added ability to broadcast to multiple rooms using `.broadcast()`.
+* [DEPRECATION] Deprecated `.rooms()` method, since it uses undocumented socket.io functionality.
+* [DEPRECATION] Deprecated `.emit()` and `.emitAll()` and made them aliases for `.broadcast()`.
+* [DEPRECATION] Deprecated `.socketRooms()`.
+* [DEPRECATION] Deprecated `.id()` (made it an alias of `.getId()`).
+* [DEPRECATION] Deprecated synchronous use of `.subscribers()`.
 
 ##### Low Risk Compatibility Warnings
 
