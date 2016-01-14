@@ -1,5 +1,14 @@
 # sails-hook-sockets changelog
 
+### 0.13.2
+
+* [ENHANCEMENT] Optimized `.addRoomMembersToRooms()`, `.removeRoomMembersFromRooms()` for use with single socket rooms
+* [ENHANCEMENT] Made `.join()` and `.leave()` work cross-server (when provided with a socket ID)
+
+##### Low Risk Compatibility Warnings
+
+ * Since `.join()` and `.leave()` no longer throw if given an ID of a socket that is not connected to the server--instead, they will use `.addRoomMembersToRooms()` or `.removeRoomMembersFromRooms()` to give any other connected servers the chance to find that socket.  If you must check for socket connection on the server first, inspect `sails.io.sockets.connected[socketId]` (see http://socket.io/docs/server-api/#namespace#connected:object)
+
 ### 0.13.1
 
 * [ENHANCEMENT] Added `.addRoomMembersToRooms()`
