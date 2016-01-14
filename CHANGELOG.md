@@ -1,5 +1,9 @@
 # sails-hook-sockets changelog
 
+### 0.13.3
+
+* [BUGFIX] Added missing require()s to ensured that hook works without Sails globals enabled
+
 ### 0.13.2
 
 * [ENHANCEMENT] Optimized `.addRoomMembersToRooms()`, `.removeRoomMembersFromRooms()` for use with single socket rooms
