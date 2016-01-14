@@ -53,10 +53,36 @@ describe('with redis', function (){
       },
 
       // A test route which broadcasts a message to a room
-      'POST /testroom/broadcast': function (req, res){
-        req._sails.sockets.broadcast('testroom', {msg: 'HI! HI HI! HI HI!'});
+      'POST /broadcast': function (req, res){
+        var room = req.param('room') || 'testroom';
+        var msg = req.param('msg') || 'HI! HI HI! HI HI!';
+        var eventName = req.param('event') || 'message';
+        req._sails.sockets.broadcast(room, eventName, {msg: msg});
         return res.send();
+      },
+
+      'PUT /testroom/joinPlayroom': function (req, res) {
+        req._sails.sockets.addRoomMembersToRooms('testroom', 'playroom', function(err) {
+          if (err) {return res.serverError(err);}
+          return res.send();
+        });
+      },
+
+      'PUT /testroom/leavePlayroom': function (req, res) {
+        req._sails.sockets.removeRoomMembersFromRooms('testroom', 'playroom', function(err) {
+          if (err) {return res.serverError(err);}
+          return res.send();
+        });
+      },
+
+      'PUT /leaveAllRooms': function (req, res) {
+        req._sails.sockets.leaveAll('testroom', function(err) {
+          if (err) {return res.serverError(err);}
+          return res.send();
+        });
       }
+
+
     }
   };
 
@@ -132,7 +158,7 @@ describe('with redis', function (){
 
           before(function (done){
             var oneSocket = sockets[0];
-            oneSocket.post('/testroom/broadcast', function (data, jwr){
+            oneSocket.post('/broadcast', function (data, jwr){
               if (jwr.error) return done(jwr.error);
               return done();
             });
@@ -147,6 +173,115 @@ describe('with redis', function (){
 
       });
 
+      describe('when one socket uses `addRoomMembersToRoom` to join all members of `testroom` to `playroom`', function (){
+
+        before(function (done) {
+          sockets[0].put('/testroom/joinPlayroom', function (data, jwr) {
+            if (jwr.error) {return done(jwr.error);}
+            return done();
+          });
+        });
+
+        describe('and all sockets listen for the `letsplay` event', function() {
+
+          before(function (){
+            _.each(sockets, function (socket){
+              socket.on('letsplay', function (event){
+                socket._receivedPlayEvents = socket._receivedPlayEvents || [];
+                socket._receivedPlayEvents.push(event);
+              });
+            });
+          });
+
+          describe('and then one socket broadcasts a `letsplay` event', function (){
+
+            before(function (done){
+              var oneSocket = sockets[0];
+              oneSocket.post('/broadcast', {room: 'playroom', event: 'letsplay', msg: 'PLAYTIME!'}, function (data, jwr){
+                if (jwr.error) return done(jwr.error);
+                return done();
+              });
+            });
+
+            it('all connected sockets should receive the message (even though they are connected to different instances)', function (){
+              _.each(sockets, function (socket){
+                assert(socket._receivedPlayEvents && socket._receivedPlayEvents.length == 1, util.format('Socket connected to app on port %d did not receive the message', socket.port));
+              });
+            });
+          });
+
+        });
+
+      });
+
+      describe('when one socket uses `removeRoomMembersFromRoom` to remove all members of `testroom` from `playroom`', function (){
+
+        before(function (done) {
+          sockets[0].put('/testroom/leavePlayroom', function (data, jwr) {
+            if (jwr.error) {return done(jwr.error);}
+            return done();
+          });
+        });
+
+        describe('and all sockets listen for the `letsplaymore` event', function() {
+
+          before(function (){
+            _.each(sockets, function (socket){
+              socket.on('letsplaymore', function (event){
+                socket._receivedPlayMoreEvents = socket._receivedPlayEvents || [];
+                socket._receivedPlayMoreEvents.push(event);
+              });
+            });
+          });
+
+          describe('and then one socket broadcasts a `letsplaymore` event', function (){
+
+            before(function (done){
+              var oneSocket = sockets[0];
+              oneSocket.post('/broadcast', {room: 'playroom', event: 'letsplaymore', msg: 'PLAYTIME!'}, function (data, jwr){
+                if (jwr.error) return done(jwr.error);
+                return done();
+              });
+            });
+
+            it('connected sockets should not receive the message', function (){
+              _.each(sockets, function (socket){
+                assert(!socket._receivedPlayMoreEvents, util.format('Socket connected to app on port %d received the message', socket.port));
+              });
+            });
+          });
+
+        });
+
+      });
+
+      describe('when one socket uses `leaveAll` to remove all members of `testroom` from all rooms', function (){
+
+        before(function (done) {
+          sockets[0].put('/leaveAllRooms', function (data, jwr) {
+            if (jwr.error) {return done(jwr.error);}
+            return done();
+          });
+        });
+
+        describe('and then one socket broadcasts a `message` event', function (){
+
+          before(function (done){
+            var oneSocket = sockets[0];
+            oneSocket.post('/broadcast', function (data, jwr){
+              if (jwr.error) return done(jwr.error);
+              return done();
+            });
+          });
+
+          it('connected sockets should not receive the message', function (){
+            _.each(sockets, function (socket){
+              assert(!(socket._receivedMessageEvents && socket._receivedMessageEvents.length == 2), util.format('Socket connected to app on port %d received the message', socket.port));
+            });
+          });
+        });
+
+      });
 
     });
 

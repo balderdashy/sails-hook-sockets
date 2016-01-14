@@ -85,7 +85,7 @@ describe('with redis -- bus', function (){
                 app._receivedMessageEvents[event] = app._receivedMessageEvents[event] || [];
                 app._receivedMessageEvents[event].push(payload);
               });
-              app.once('hook:sockets:adminSocketConnected', next);
+              return next();
             }, next);
           },
           connectClientSockets: function(next) {
@@ -98,7 +98,7 @@ describe('with redis -- bus', function (){
               socket._receivedMessageEvents = {};
               sockets.push(socket);
               socket.on('connect', function(socket){ next(); });
-              socket.on('sails', function(data) {
+              socket.on('message', function(data) {
                 socket._receivedMessageEvents[data.event] = true;
               });
             }, next);
