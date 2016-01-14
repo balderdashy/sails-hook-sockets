@@ -8,6 +8,11 @@ var util = require('util');
 
 describe('basic usage', function (){
 
+  var sails;
+  before(function() {
+    sails = global._sails;
+  });
+
   it('should not crash', function (done){
     done();
   });

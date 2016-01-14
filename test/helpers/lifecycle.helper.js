@@ -25,14 +25,17 @@ module.exports = {
 
     app.lift({
       port: TEST_SERVER_PORT,
+      globals: false,
       log: { level: 'warn' },
       hooks: {
         // Inject the sockets hook in this repo into this Sails app
         sockets: require('../..')
       },
       loadHooks: ['moduleloader', 'userconfig', 'http', 'session', 'sockets']
-    },function (err) {
+    },function (err, sails) {
       if (err) return done(err);
+
+      global._sails = sails;
 
       // Instantiate socket client.
       var client = sailsioClient(socketioClient);
@@ -73,7 +76,7 @@ module.exports = {
       var isActuallyDisconnected = (global.io.socket.isConnected() === false);
 
       // Tear down sails server
-      global.sails.lower(function (){
+      global._sails.lower(function (){
 
         // Delete globals (just in case-- shouldn't matter)
         delete global.sails;

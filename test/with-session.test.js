@@ -8,7 +8,11 @@ var assert = require('assert');
 
 describe('with session', function (){
 
+  var sails;
+
   before(function _setupRoutes(){
+
+    sails = global._sails;
 
     sails.router.bind('PUT /me/jamiroquai', function (req, res){
       req.session.me = {

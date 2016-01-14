@@ -13,6 +13,12 @@ var ERRORPACK = require('../lib/errors');
 
 describe('low-level socket methods:', function (){
 
+  var sails;
+
+  before(function() {
+    sails = global._sails;
+  });
+
   // Set up helper routes for the tests below
   before(function(){
     sails.get('/socketMethods/helpers/getIdOfRequestingSocket', function(req, res){

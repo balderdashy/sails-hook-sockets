@@ -4,6 +4,11 @@ var _ = require('lodash');
 
 describe('when posting json arrays', function () {
 
+  var sails;
+  before(function() {
+    sails = global._sails;
+  });
+
   it('should be able to send and receive it as an array', function (done) {
     var postData = [{
       id: 7,
