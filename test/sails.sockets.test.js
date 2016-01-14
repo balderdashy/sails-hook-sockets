@@ -596,8 +596,15 @@ describe('low-level socket methods:', function (){
   });
 
   describe('sails.sockets.subscribers() asynchronous usage', function (done){
+    var sawWarning = false;
     before(function(){
       sails.get('/socketMethods/subscribersAsync', function(req, res){
+        var origWarn = sails.log.warn;
+        sails.log.warn = function(msg) {
+          sawWarning = true;
+          origWarn.apply(this, arguments);
+          sails.log.warn = origWarn;
+        };
         sails.sockets.subscribers('winterfell', function(err, idsOfRoomMembers) {
           if (err) {return res.serverError(err);}
           return res.send(idsOfRoomMembers);
@@ -636,6 +643,12 @@ describe('low-level socket methods:', function (){
         return done();
       });
     });
+
+
+    it('should show a deprecation warning', function() {
+      assert(sawWarning);
+    });
+
   });
 
   describe('sails.sockets.blast()', function (){
