@@ -45,9 +45,36 @@ describe('with redis', function (){
     },
 
     routes: {
+      'GET /id': function(req, res) {
+        res.send(req.socket.id);
+      },
       // A test route which joins a room
       'PUT /testroom/join': function (req, res){
         req._sails.sockets.join(req, 'testroom', function() {
+          res.send();
+        });
+      },
+
+      'PUT /funRoom/join': function (req, res){
+        req._sails.sockets.join(req.param('socketId'), 'funRoom', function() {
+          res.send();
+        });
+      },
+
+      'PUT /funRoom/leave': function (req, res){
+        req._sails.sockets.leave(req.param('socketId'), 'funRoom', function() {
+          res.send();
+        });
+      },
+
+      'PUT /awesomeRoom/joinByRoom': function (req, res){
+        req._sails.sockets.addRoomMembersToRooms(req.param('socketId'), 'awesomeRoom', function() {
+          res.send();
+        });
+      },
+
+      'PUT /awesomeRoom/leaveByRoom': function (req, res){
+        req._sails.sockets.removeRoomMembersFromRooms(req.param('socketId'), 'awesomeRoom', function() {
           res.send();
         });
       },
@@ -108,15 +135,21 @@ describe('with redis', function (){
     describe('after each app has at least one socket connected', function (){
 
       var sockets = [];
+      var socketIds = [];
       before(function (done){
-        async.each(apps, function (app, next){
+        async.eachSeries(apps, function (app, next){
           var socket = io.sails.connect('http://localhost:'+app.config.port, {
             // This prevents multiple socket.io clients attempting to share
             // the same global socket (which would render this test meaningless)
             multiplex: false
           });
           sockets.push(socket);
-          socket.on('connect', function(){ next(); });
+          socket.on('connect', function(){
+            socket.get('/id', function(data) {
+              socketIds.push(data);
+              return next();
+            });
+          });
         }, done);
       });
       after(function (done){
@@ -173,7 +206,7 @@ describe('with redis', function (){
 
       });
 
-      describe('when one socket uses `addRoomMembersToRoom` to join all members of `testroom` to `playroom`', function (){
+      describe('when one socket uses `addRoomMembersToRooms` to join all members of `testroom` to `playroom`', function (){
 
         before(function (done) {
           sockets[0].put('/testroom/joinPlayroom', function (data, jwr) {
@@ -214,7 +247,7 @@ describe('with redis', function (){
 
       });
 
-      describe('when one socket uses `removeRoomMembersFromRoom` to remove all members of `testroom` from `playroom`', function (){
+      describe('when one socket uses `removeRoomMembersFromRooms` to remove all members of `testroom` from `playroom`', function (){
 
         before(function (done) {
           sockets[0].put('/testroom/leavePlayroom', function (data, jwr) {
@@ -279,6 +312,210 @@ describe('with redis', function (){
               assert(!(socket._receivedMessageEvents && socket._receivedMessageEvents.length == 2), util.format('Socket connected to app on port %d received the message', socket.port));
             });
           });
+        });
+
+      });
+
+      describe('when one socket uses `join` to add a socket on another server to `funRoom`', function (){
+
+        var funRoomSocket;
+        before(function (done) {
+          funRoomSocket = sockets[1];
+          sockets[0].put('/funRoom/join/?socketId=' + socketIds[1], function (data, jwr) {
+            if (jwr.error) {return done(jwr.error);}
+            return done();
+          });
+        });
+
+        describe('and the other socket listens for the `funRoomMsg` event', function() {
+
+          before(function (){
+            funRoomSocket.on('funRoomMsg', function (event){
+              funRoomSocket._receivedFunRoomEvents = funRoomSocket._receivedFunRoomEvents || [];
+              funRoomSocket._receivedFunRoomEvents.push(event);
+            });
+          });
+
+          describe('and then one socket broadcasts a `funRoomMsg` event', function (){
+
+            before(function (done){
+              var oneSocket = sockets[2];
+              oneSocket.post('/broadcast', {room: 'funRoom', event: 'funRoomMsg', msg: 'PLAYTIME!'}, function (data, jwr){
+                if (jwr.error) return done(jwr.error);
+                return done();
+              });
+            });
+
+            it('the subscribed socket should receive the message', function (){
+              assert(funRoomSocket._receivedFunRoomEvents && funRoomSocket._receivedFunRoomEvents.length == 1, 'Socket did not receive the fun room message!');
+            });
+
+            it('other sockets should not receive the message', function() {
+              _.each(sockets, function (socket){
+                if (socket == funRoomSocket) {return;}
+                assert(!socket._receivedFunRoomEvents, util.format('Socket connected to app on port %d received the message', socket.port));
+              });
+            });
+
+          });
+
+        });
+
+      });
+
+      describe('when one socket uses `leave` to remove a socket on another server from `funRoom`', function (){
+
+        var funRoomSocket;
+        before(function (done) {
+          funRoomSocket = sockets[1];
+          sockets[0].put('/funRoom/leave/?socketId=' + socketIds[1], function (data, jwr) {
+            if (jwr.error) {return done(jwr.error);}
+            return done();
+          });
+        });
+
+        describe('and the other socket listens for the `noMoreFunRoomMsg` event', function() {
+
+          before(function (){
+            funRoomSocket.on('noMoreFunRoomMsg', function (event){
+              funRoomSocket._receivedNoFunRoomEvents = funRoomSocket._receivedNoFunRoomEvents || [];
+              funRoomSocket._receivedNoFunRoomEvents.push(event);
+            });
+          });
+
+          describe('and then one socket broadcasts a `noMoreFunRoomMsg` event', function (){
+
+            before(function (done){
+              var oneSocket = sockets[2];
+              oneSocket.post('/broadcast', {room: 'funRoom', event: 'noMoreFunRoomMsg', msg: 'PLAYTIME!'}, function (data, jwr){
+                if (jwr.error) return done(jwr.error);
+                return done();
+              });
+            });
+
+            it('no sockets should not receive the message', function() {
+              _.each(sockets, function (socket){
+                assert(!socket._receivedNoFunRoomEvents, util.format('Socket connected to app on port %d received the message', socket.port));
+              });
+            });
+
+          });
+
+        });
+
+      });
+
+      describe('when one socket uses `addRoomMembersToRooms` to add a single socket on the same server to `awesomeRoom`', function (){
+
+        var adminMessagesReceived = 0;
+        function rcvdAdminMessage() {adminMessagesReceived++;}
+        before(function (done) {
+          _.each(apps, function(app) {
+            app.on('hook:sockets:adminMessage', rcvdAdminMessage);
+          });
+          sockets[0].put('/awesomeRoom/joinByRoom/?socketId=' + socketIds[0], function (data, jwr) {
+            if (jwr.error) {return done(jwr.error);}
+            return done();
+          });
+        });
+
+        after(function() {
+          _.each(apps, function(app) {
+            app.removeListener('hook:sockets:adminMessage', rcvdAdminMessage);
+          });
+        });
+
+        describe('and the socket listens for the `awesomeRoomMsg` event', function() {
+
+          before(function (){
+            sockets[0].on('awesomeRoomMsg', function (event){
+              sockets[0]._receivedAwesomeRoomEvents = sockets[0]._receivedAwesomeRoomEvents || [];
+              sockets[0]._receivedAwesomeRoomEvents.push(event);
+            });
+          });
+
+          describe('and then one socket broadcasts a `awesomeRoomMsg` event', function (){
+
+            before(function (done){
+              var oneSocket = sockets[2];
+              oneSocket.post('/broadcast', {room: 'awesomeRoom', event: 'awesomeRoomMsg', msg: 'PLAYTIME!'}, function (data, jwr){
+                if (jwr.error) return done(jwr.error);
+                return done();
+              });
+            });
+
+            it('the subscribed socket should receive the message', function (){
+              assert(sockets[0]._receivedAwesomeRoomEvents && sockets[0]._receivedAwesomeRoomEvents.length == 1, 'Socket did not receive the fun room message!');
+            });
+
+            it('other sockets should not receive the message', function() {
+              _.each(sockets, function (socket){
+                if (socket == sockets[0]) {return;}
+                assert(!socket._receivedAwesomeRoomEvents, util.format('Socket connected to app on port %d received the message', socket.port));
+              });
+            });
+
+            it('no app should have received an admin message', function() {
+              assert.equal(adminMessagesReceived, 0);
+            });
+
+          });
+
+        });
+
+      });
+
+      describe('when one socket uses `removeRoomMembersFromRooms` to remove a single socket on the same server from `awesomeRoom`', function (){
+
+        var adminMessagesReceived = 0;
+        function rcvdAdminMessage() {adminMessagesReceived++;}
+        before(function (done) {
+          _.each(apps, function(app) {
+            app.on('hook:sockets:adminMessage', rcvdAdminMessage);
+          });
+          sockets[0].put('/awesomeRoom/leaveByRoom/?socketId=' + socketIds[0], function (data, jwr) {
+            if (jwr.error) {return done(jwr.error);}
+            return done();
+          });
+        });
+
+        after(function() {
+          _.each(apps, function(app) {
+            app.removeListener('hook:sockets:adminMessage', rcvdAdminMessage);
+          });
+        });
+
+        describe('and the socket listens for the `awesomeNoMoreRoomMsg` event', function() {
+
+          before(function (){
+            sockets[0].on('awesomeNoMoreRoomMsg', function (event){
+              sockets[0]._receivedAwesomeNoMoreRoomEvents = sockets[0]._receivedAwesomeNoMoreRoomEvents || [];
+              sockets[0]._receivedAwesomeNoMoreRoomEvents.push(event);
+            });
+          });
+
+          describe('and then one socket broadcasts a `awesomeNoMoreRoomMsg` event', function (){
+
+            before(function (done){
+              var oneSocket = sockets[2];
+              oneSocket.post('/broadcast', {room: 'awesomeRoom', event: 'awesomeNoMoreRoomMsg', msg: 'PLAYTIME!'}, function (data, jwr){
+                if (jwr.error) return done(jwr.error);
+                return done();
+              });
+            });
+
+            it('no sockets should receive the message', function() {
+              _.each(sockets, function (socket){
+                assert(!socket._receivedAwesomeNoMoreRoomEvents, util.format('Socket connected to app on port %d received the message', socket.port));
+              });
+            });
+
+            it('no app should have received an admin message', function() {
+              assert.equal(adminMessagesReceived, 0);
+            });
+
+          });
+
         });
 
       });
