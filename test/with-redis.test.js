@@ -51,31 +51,36 @@ describe('with redis', function (){
       // A test route which joins a room
       'PUT /testroom/join': function (req, res){
         req._sails.sockets.join(req, 'testroom', function() {
-          res.send();
+          // Add slight delay to allow all servers to react
+          setTimeout(function(){res.send();}, 100);
         });
       },
 
       'PUT /funRoom/join': function (req, res){
         req._sails.sockets.join(req.param('socketId'), 'funRoom', function() {
-          res.send();
+          // Add slight delay to allow all servers to react
+          setTimeout(function(){res.send();}, 100);
         });
       },
 
       'PUT /funRoom/leave': function (req, res){
         req._sails.sockets.leave(req.param('socketId'), 'funRoom', function() {
-          res.send();
+          // Add slight delay to allow all servers to react
+          setTimeout(function(){res.send();}, 100);
         });
       },
 
       'PUT /awesomeRoom/joinByRoom': function (req, res){
         req._sails.sockets.addRoomMembersToRooms(req.param('socketId'), 'awesomeRoom', function() {
-          res.send();
+          // Add slight delay to allow all servers to react
+          setTimeout(function(){res.send();}, 100);
         });
       },
 
       'PUT /awesomeRoom/leaveByRoom': function (req, res){
         req._sails.sockets.removeRoomMembersFromRooms(req.param('socketId'), 'awesomeRoom', function() {
-          res.send();
+          // Add slight delay to allow all servers to react
+          setTimeout(function(){res.send();}, 100);
         });
       },
 
@@ -91,21 +96,24 @@ describe('with redis', function (){
       'PUT /testroom/joinPlayroom': function (req, res) {
         req._sails.sockets.addRoomMembersToRooms('testroom', 'playroom', function(err) {
           if (err) {return res.serverError(err);}
-          return res.send();
+          // Add slight delay to allow all servers to react
+          setTimeout(function(){res.send();}, 100);
         });
       },
 
       'PUT /testroom/leavePlayroom': function (req, res) {
         req._sails.sockets.removeRoomMembersFromRooms('testroom', 'playroom', function(err) {
           if (err) {return res.serverError(err);}
-          return res.send();
+          // Add slight delay to allow all servers to react
+          setTimeout(function(){res.send();}, 100);
         });
       },
 
       'PUT /leaveAllRooms': function (req, res) {
         req._sails.sockets.leaveAll('testroom', function(err) {
           if (err) {return res.serverError(err);}
-          return res.send();
+          // Add slight delay to allow all servers to react
+          setTimeout(function(){res.send();}, 100);
         });
       }
 
