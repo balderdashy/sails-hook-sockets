@@ -1,5 +1,13 @@
 # sails-hook-sockets changelog
 
+### 0.13.1
+
+* [ENHANCEMENT] Added `.addRoomMembersToRooms()`
+* [ENHANCEMENT] Added `.removeRoomMembersFromRooms()`
+* [ENHANCEMENT] Added `.leaveAll()`
+* [ENHANCEMENT] Refactored admin bus to connect directly to Redis rather than using a socket.io client connection
+* [DEPRECATION] Deprecated `.subscribers()`.
+
 ### 0.13.0
 
 * [ENHANCEMENT] Added callback argument to `.join()`, `.leave()` and `.subscribers()`.
