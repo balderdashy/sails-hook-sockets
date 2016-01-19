@@ -15,15 +15,15 @@ describe('with session', function (){
     sails = global._sails;
 
     sails.router.bind('PUT /me/jamiroquai', function (req, res){
-      req.session.me = {
+      req.session && (req.session.me = {
         id: 8,
         name: 'Jamiroquai'
-      };
+      });
       res.send(200);
     });
 
     sails.router.bind('GET /me', function (req, res){
-      res.send(req.session.me);
+      res.send(req.session && req.session.me || null);
     });
   });
 
@@ -37,7 +37,10 @@ describe('with session', function (){
     var TEST_SERVER_PORT = 1577;
 
     secondSocket = io.sails.connect('http://localhost:'+TEST_SERVER_PORT, {
-      multiplex: false
+      multiplex: false,
+      initialConnectionHeaders: {
+        nosession: true
+      }
     });
     secondSocket.on('connect', function(){ done(); });
   });
@@ -70,6 +73,28 @@ describe('with session', function (){
     });
 
   });
+
+  it('should not leak sessions between sockets', function (done){
+
+    secondSocket.get('/me', function (data) {
+      assert.equal(data, null);
+      done();
+    });
+
+  });
+
+  it('the nosession header should prevent sessions from connecting', function (done){
+
+    secondSocket.put('/me/jamiroquai', function (unused, jwr) {
+
+      secondSocket.get('/me', function (data) {
+        assert.deepEqual(data, null);
+        done();
+      });
+    });
+
+  });
+
 
 
 });
