@@ -23,7 +23,7 @@ describe('with session', function (){
     });
 
     sails.router.bind('GET /me', function (req, res){
-      res.send(req.session && req.session.me || null);
+      res.send(req.session && req.session.me || 'foo');
     });
   });
 
@@ -77,7 +77,7 @@ describe('with session', function (){
   it('should not leak sessions between sockets', function (done){
 
     secondSocket.get('/me', function (data) {
-      assert.equal(data, null);
+      assert.equal(data, 'foo');
       done();
     });
 
@@ -88,7 +88,7 @@ describe('with session', function (){
     secondSocket.put('/me/jamiroquai', function (unused, jwr) {
 
       secondSocket.get('/me', function (data) {
-        assert.deepEqual(data, null);
+        assert.deepEqual(data, 'foo');
         done();
       });
     });
