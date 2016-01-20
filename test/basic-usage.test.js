@@ -75,7 +75,25 @@ describe('basic usage', function (){
 
   });
 
-  it('should not expose all of the CORS response headers');
+  describe('should create a request context', function (done){
+    var req;
+    before(function(done) {
+      sails.router.bind('GET /showRequest', function (_req, res){
+        req = _req;
+        res.send(200);
+        return done();
+      });
+      io.socket.get('/showRequest?abc=123');
+    });
+
+    it('with isSocket == true', function() {assert.equal(req.isSocket, true);});
+    it('with correct method', function() {assert.equal(req.method, 'GET');});
+    it('with correct url', function() {assert.equal(req.url, '/showRequest?abc=123');});
+    it('with correct originalUrl', function() {assert.equal(req.originalUrl, '/showRequest?abc=123');});
+    it('with correct path', function() {assert.equal(req.path, '/showRequest');});
+
+
+  });
 
 
 });
