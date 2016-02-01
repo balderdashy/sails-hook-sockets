@@ -84,6 +84,14 @@ describe('with redis', function (){
         });
       },
 
+      // A test route which blasts a message
+      'POST /blast': function (req, res){
+        var msg = req.param('msg') || 'HI! HI HI! HI HI!';
+        var eventName = req.param('event') || 'blasted';
+        req._sails.sockets.blast(eventName, {msg: msg});
+        return res.send();
+      },
+
       // A test route which broadcasts a message to a room
       'POST /broadcast': function (req, res){
         var room = req.param('room') || 'testroom';
@@ -178,7 +186,37 @@ describe('with redis', function (){
       //
       //||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
+      describe('when all sockets listen for the `blasted` event', function (){
 
+        before(function (done){
+          async.each(sockets, function (socket, next){
+            socket.on('blasted', function (event){
+              console.log("socket on port", socket.port, "received blast!");
+              socket._receivedBlastEvents = socket._receivedBlastEvents || [];
+              socket._receivedBlastEvents.push(event);
+            });
+            return next();
+          }, done);
+        });
+
+        describe('and then one socket blasts a message', function (){
+
+          before(function (done){
+            var oneSocket = sockets[0];
+            oneSocket.post('/blast', function (data, jwr){
+              if (jwr.error) return done(jwr.error);
+              return done();
+            });
+          });
+
+          it('all connected sockets should receive the message (even though they are connected to different instances)', function (){
+            _.each(sockets, function (socket){
+              assert(socket._receivedBlastEvents && socket._receivedBlastEvents.length == 1, util.format('Socket connected to app on port %d did not receive the message', socket.port));
+            });
+          });
+        });
+
+      });
 
       describe('when all sockets join a room and listen for the `message` event', function (){
 
