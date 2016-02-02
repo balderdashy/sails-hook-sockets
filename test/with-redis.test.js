@@ -191,7 +191,6 @@ describe('with redis', function (){
         before(function (done){
           async.each(sockets, function (socket, next){
             socket.on('blasted', function (event){
-              console.log("socket on port", socket.port, "received blast!");
               socket._receivedBlastEvents = socket._receivedBlastEvents || [];
               socket._receivedBlastEvents.push(event);
             });
@@ -205,7 +204,7 @@ describe('with redis', function (){
             var oneSocket = sockets[0];
             oneSocket.post('/blast', function (data, jwr){
               if (jwr.error) return done(jwr.error);
-              return done();
+              return setTimeout(done, 200);
             });
           });
 
@@ -239,7 +238,7 @@ describe('with redis', function (){
             var oneSocket = sockets[0];
             oneSocket.post('/broadcast', function (data, jwr){
               if (jwr.error) return done(jwr.error);
-              return done();
+              return setTimeout(done, 200);
             });
           });
 
@@ -257,7 +256,7 @@ describe('with redis', function (){
         before(function (done) {
           sockets[0].put('/testroom/joinPlayroom', function (data, jwr) {
             if (jwr.error) {return done(jwr.error);}
-            return done();
+            return setTimeout(done, 200);
           });
         });
 
@@ -278,7 +277,7 @@ describe('with redis', function (){
               var oneSocket = sockets[0];
               oneSocket.post('/broadcast', {room: 'playroom', event: 'letsplay', msg: 'PLAYTIME!'}, function (data, jwr){
                 if (jwr.error) return done(jwr.error);
-                return done();
+                return setTimeout(done, 200);
               });
             });
 
@@ -319,7 +318,7 @@ describe('with redis', function (){
               var oneSocket = sockets[0];
               oneSocket.post('/broadcast', {room: 'playroom', event: 'letsplaymore', msg: 'PLAYTIME!'}, function (data, jwr){
                 if (jwr.error) return done(jwr.error);
-                return done();
+                return setTimeout(done, 200);
               });
             });
 
@@ -349,7 +348,7 @@ describe('with redis', function (){
             var oneSocket = sockets[0];
             oneSocket.post('/broadcast', function (data, jwr){
               if (jwr.error) return done(jwr.error);
-              return done();
+              return setTimeout(done, 200);
             });
           });
 
@@ -369,7 +368,7 @@ describe('with redis', function (){
           funRoomSocket = sockets[1];
           sockets[0].put('/funRoom/join/?socketId=' + socketIds[1], function (data, jwr) {
             if (jwr.error) {return done(jwr.error);}
-            return done();
+            return setTimeout(done, 200);
           });
         });
 
@@ -388,7 +387,7 @@ describe('with redis', function (){
               var oneSocket = sockets[2];
               oneSocket.post('/broadcast', {room: 'funRoom', event: 'funRoomMsg', msg: 'PLAYTIME!'}, function (data, jwr){
                 if (jwr.error) return done(jwr.error);
-                return done();
+                return setTimeout(done, 200);
               });
             });
 
@@ -416,7 +415,7 @@ describe('with redis', function (){
           funRoomSocket = sockets[1];
           sockets[0].put('/funRoom/leave/?socketId=' + socketIds[1], function (data, jwr) {
             if (jwr.error) {return done(jwr.error);}
-            return done();
+            return setTimeout(done, 200);
           });
         });
 
@@ -435,7 +434,7 @@ describe('with redis', function (){
               var oneSocket = sockets[2];
               oneSocket.post('/broadcast', {room: 'funRoom', event: 'noMoreFunRoomMsg', msg: 'PLAYTIME!'}, function (data, jwr){
                 if (jwr.error) return done(jwr.error);
-                return done();
+                return setTimeout(done, 200);
               });
             });
 
@@ -461,7 +460,7 @@ describe('with redis', function (){
           });
           sockets[0].put('/awesomeRoom/joinByRoom/?socketId=' + socketIds[0], function (data, jwr) {
             if (jwr.error) {return done(jwr.error);}
-            return done();
+            return setTimeout(done, 200);
           });
         });
 
@@ -486,7 +485,7 @@ describe('with redis', function (){
               var oneSocket = sockets[2];
               oneSocket.post('/broadcast', {room: 'awesomeRoom', event: 'awesomeRoomMsg', msg: 'PLAYTIME!'}, function (data, jwr){
                 if (jwr.error) return done(jwr.error);
-                return done();
+                return setTimeout(done, 200);
               });
             });
 
@@ -521,7 +520,7 @@ describe('with redis', function (){
           });
           sockets[0].put('/awesomeRoom/leaveByRoom/?socketId=' + socketIds[0], function (data, jwr) {
             if (jwr.error) {return done(jwr.error);}
-            return done();
+            return setTimeout(done, 200);
           });
         });
 
@@ -546,7 +545,7 @@ describe('with redis', function (){
               var oneSocket = sockets[2];
               oneSocket.post('/broadcast', {room: 'awesomeRoom', event: 'awesomeNoMoreRoomMsg', msg: 'PLAYTIME!'}, function (data, jwr){
                 if (jwr.error) return done(jwr.error);
-                return done();
+                return setTimeout(done, 200);
               });
             });
 

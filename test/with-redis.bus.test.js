@@ -117,7 +117,7 @@ describe('with redis -- bus', function (){
           var oneSocket = sockets[0];
           oneSocket.post('/testroom/adminBroadcast', function (data, jwr){
             if (jwr.error) return done(jwr.error);
-            return done();
+            setTimeout(done, 200);
           });
         });
 
@@ -149,7 +149,7 @@ describe('with redis -- bus', function (){
           var oneSocket = sockets[0];
           oneSocket.post('/testroom/adminBlast', function (data, jwr){
             if (jwr.error) return done(jwr.error);
-            return done();
+            setTimeout(done, 200);
           });
         });
 
