@@ -138,11 +138,11 @@ describe('low-level socket methods:', function (){
 
     before(function (){
       sails.get('/socketMethods/sails.sockets.id', function (req, res){
-        var origWarn = sails.log.warn;
-        sails.log.warn = function(msg) {
+        var origDebug = sails.log.debug;
+        sails.log.debug = function(msg) {
           sawWarning = true;
-          origWarn.apply(this, arguments);
-          sails.log.warn = origWarn;
+          origDebug.apply(this, arguments);
+          sails.log.debug = origDebug;
         };
         actualSocketId = req.socket.id;
         var socketId = sails.sockets.id(req.socket);
@@ -553,11 +553,11 @@ describe('low-level socket methods:', function (){
     var sawWarning = false;
     before(function(){
       sails.get('/socketMethods/subscribers', function(req, res){
-        var origWarn = sails.log.warn;
-        sails.log.warn = function(msg) {
+        var origDebug = sails.log.debug;
+        sails.log.debug = function(msg) {
           sawWarning = true;
-          origWarn.apply(this, arguments);
-          sails.log.warn = origWarn;
+          origDebug.apply(this, arguments);
+          sails.log.debug = origDebug;
         };
         var idsOfRoomMembers = sails.sockets.subscribers('winterfell');
         return res.send(idsOfRoomMembers);
@@ -605,11 +605,11 @@ describe('low-level socket methods:', function (){
     var sawWarning = false;
     before(function(){
       sails.get('/socketMethods/subscribersAsync', function(req, res){
-        var origWarn = sails.log.warn;
-        sails.log.warn = function(msg) {
+        var origDebug = sails.log.debug;
+        sails.log.debug = function(msg) {
           sawWarning = true;
-          origWarn.apply(this, arguments);
-          sails.log.warn = origWarn;
+          origDebug.apply(this, arguments);
+          sails.log.debug = origDebug;
         };
         sails.sockets.subscribers('winterfell', function(err, idsOfRoomMembers) {
           if (err) {return res.serverError(err);}
