@@ -1,5 +1,17 @@
 # sails-hook-sockets changelog
 
+### 0.13.6
+
+* [BUGFIX] Make "async" a full dependency, to ensure compatibility with Sails when globals are turned off [a5bd1e1](https://github.com/balderdashy/sails-hook-sockets/commit/a5bd1e1e8c6e44177b0ac67ecf9449f86e76c533)
+
+### 0.13.5
+
+* [ENHANCEMENT] Forward the "nosession" header to the Sails virtual router (allowing sockets to connect without creating sessions) [7331197](https://github.com/balderdashy/sails-hook-sockets/commit/733119797ea357dcabd9a4dc2b2d52f601a22398)
+
+### 0.13.4
+
+* [BUGFIX] Fix issue where admin bus crashes when "db" or "pass" is not specified in redis config [14210dc](https://github.com/balderdashy/sails-hook-sockets/commit/14210dc8d81e638f198493e05dda5eb8651f0e8f)
+
 ### 0.13.3
 
 * [BUGFIX] Added missing require()s to ensured that hook works without Sails globals enabled
