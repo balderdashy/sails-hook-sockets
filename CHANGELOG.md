@@ -1,5 +1,9 @@
 # sails-hook-sockets changelog
 
+### 0.13.7
+
+* [BUGFIX] Correctly handle joining/leaving rooms using socket ID as the first argument [#22](https://github.com/balderdashy/sails-hook-sockets/issues/22)
+
 ### 0.13.6
 
 * [BUGFIX] Make "async" a full dependency, to ensure compatibility with Sails when globals are turned off [a5bd1e1](https://github.com/balderdashy/sails-hook-sockets/commit/a5bd1e1e8c6e44177b0ac67ecf9449f86e76c533)
