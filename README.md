@@ -1,6 +1,8 @@
-# sockets
+# sails-hook-sockets
 
-`sockets` hook for Sails v0.11
+Implements Socket.io support in Sails.
+
+> This is a core hook in the Sails.js framework.  You can override or disable it using your sailsrc file or environment variables.  See http://sailsjs.org/documentation/concepts/configuration for more information.
 
 ## Status
 
