@@ -34,7 +34,7 @@ describe('with another redis client', function (){
       adapter: 'socket.io-redis',
       adapterClientConfig: {
         port: 6380,
-        pass: 'secret'
+        password: 'secret'
       },
       subEvent: 'messageBuffer',
       adapterClientName: 'ioredis'
