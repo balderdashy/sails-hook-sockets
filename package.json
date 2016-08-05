@@ -23,7 +23,8 @@
     "mocha": "^2.2.4",
     "sails": "balderdashy/sails",
     "sails.io.js": "^0.13.0",
-    "socket.io-redis": "^1.0.0"
+    "ioredis": "^2.2.0",
+    "socket.io-redis": "git+https://github.com/socketio/socket.io-redis.git"
   },
   "scripts": {
     "test": "node ./node_modules/mocha/bin/mocha test/** --timeout 5000"
