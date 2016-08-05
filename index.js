@@ -27,6 +27,10 @@ module.exports = function (app){
           if (!app.config.sockets.grant3rdPartyCookie) {
             return next();
           }
+          // We explicitly set Content-Type to javascript, because some servers
+          // require this when the header X-Content-Type-Options is set to
+          // 'nosniff'
+          res.set('Content-Type', 'application/javascript');
           res.send('_sailsIoJSConnect();');
         }
 
@@ -39,8 +43,3 @@ module.exports = function (app){
 
   };
 };
-
-
-
-
-
