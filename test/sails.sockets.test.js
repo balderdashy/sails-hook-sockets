@@ -132,38 +132,6 @@ describe('low-level socket methods:', function (){
 
   });
 
-  describe('sails.sockets.id()', function() {
-
-    var actualSocketId, sawWarning = false;
-
-    before(function (){
-      sails.get('/socketMethods/sails.sockets.id', function (req, res){
-        var origDebug = sails.log.debug;
-        sails.log.debug = function(msg) {
-          sawWarning = true;
-          origDebug.apply(this, arguments);
-          sails.log.debug = origDebug;
-        };
-        actualSocketId = req.socket.id;
-        var socketId = sails.sockets.id(req.socket);
-        return res.send(socketId);
-      });
-    });
-
-    it('should return the proper socket id', function (done){
-      theKing.get('/socketMethods/sails.sockets.id', function (data, jwr){
-        if (jwr.error) return done(jwr.error);
-        assert.equal(data, actualSocketId, 'should have returned the proper socketId ('+actualSocketId+'), but instead got:'+data);
-        return done();
-      });
-    });
-
-    it('should show a deprecation warning', function() {
-      assert(sawWarning);
-    });
-
-  });
-
   describe('sails.sockets.getId()', function (done){
 
     var actualSocketId;
@@ -267,117 +235,75 @@ describe('low-level socket methods:', function (){
       });
     });
 
-  });
-
-
-
-
-  describe('sails.sockets.socketRooms()', function (done){
-    before(function(){
-      sails.get('/socketMethods/socketRooms', function(req, res){
-        // console.log('socket %s checking room membership...', sails.sockets.id(req.socket));
-        var result1 = sails.sockets.socketRooms(req.socket);
-        var result2 = sails.sockets.socketRooms(req);
-        assert(_.isEqual(result2, result1));
-        return res.send(result1);
+    describe('sails.sockets.leave()', function (done){
+      before(function(){
+        sails.delete('/socketMethods/leave', function(req, res){
+          sails.sockets.leave(req, req.param('room'), function(err) {
+            if (err) {return res.serverError(err);}
+            var socket = sails.sockets.parseSocket(req.socket);
+            // Return the list of rooms this socket is assigned to.
+            // Since socket.io v1.4, rooms is an object
+            var rooms = _.keys(socket.rooms);
+            return res.json(rooms);
+          });
+        });
+        sails.delete('/socketMethods/leave_with_socket', function(req, res){
+          var result1 = sails.sockets.leave(req.socket, req.param('room'));
+          return res.send(result1);
+        });
+        sails.delete('/socketMethods/leave_with_id', function(req, res){
+          var result1 = sails.sockets.leave(req.socket.id, req.param('room'));
+          return res.send(result1);
+        });
       });
-    });
-    it('should not crash or throw', function (done){
-      theKing.get('/socketMethods/socketRooms', function (data, jwr) {
-        if (jwr.error) return done(jwr.error);
-        return done();
-      });
-    });
-    it('should return expected room membership before joining any rooms (1)', function (done){
-      theKing.get('/socketMethods/socketRooms', function (data, jwr) {
-        if (jwr.error) return done(jwr.error);
-        assert.equal(data.length,1, 'expected it to return a membership of 1 room; instead got '+util.inspect(data, false, null));
-        return done();
-      });
-    });
-    it('should return expected room membership after joining some rooms', function (done){
-      theKing.put('/socketMethods/join', { room: 'beast1' }, function (data, jwr) {
-        theKing.put('/socketMethods/join', { room: 'beast2' }, function (data, jwr) {
-          theKing.get('/socketMethods/socketRooms', function (data, jwr) {
-            if (jwr.error) return done(jwr.error);
-            assert.equal(data.length, 3, 'expected it to return a membership of 3 rooms; instead got '+data.length);
+      before(function(done) {
+        theKing.put('/socketMethods/join', { room: 'beast1' }, function (data, jwr) {
+          theKing.put('/socketMethods/join', { room: 'beast2' }, function (data, jwr) {
             return done();
           });
         });
       });
-    });
-    it('should properly isolate room membership of different sockets', function (done){
-      starks.bran.get('/socketMethods/socketRooms',function (data, jwr) {
-        if (jwr.error) return done(jwr.error);
-        assert.equal(data.length, 2, 'expected it to return a membership of 2 rooms; instead got '+data.length);
-        return done();
-      });
-    });
-  });
-
-
-
-
-
-  describe('sails.sockets.leave()', function (done){
-    before(function(){
-      sails.delete('/socketMethods/leave', function(req, res){
-        var result1 = sails.sockets.leave(req, req.param('room'));
-        return res.send(result1);
-      });
-      sails.delete('/socketMethods/leave_with_socket', function(req, res){
-        var result1 = sails.sockets.leave(req.socket, req.param('room'));
-        return res.send(result1);
-      });
-      sails.delete('/socketMethods/leave_with_id', function(req, res){
-        var result1 = sails.sockets.leave(req.socket.id, req.param('room'));
-        return res.send(result1);
-      });
-    });
-    describe('with a request object as the first argument', function() {
-      it('should remove the target room from the list of rooms a socket is connected to', function (done){
-        theKing.delete('/socketMethods/leave', { room: 'beast1' }, function (data, jwr) {
-          if (jwr.error) return done(jwr.error);
-
-          theKing.get('/socketMethods/socketRooms',function (data, jwr) {
+      describe('with a request object as the first argument', function() {
+        it('should remove the target room from the list of rooms a socket is connected to', function (done){
+          theKing.delete('/socketMethods/leave', { room: 'beast1' }, function (rooms, jwr) {
             if (jwr.error) return done(jwr.error);
-            assert.equal(data.length, 2, 'expected it to return a membership of 2 rooms; instead got '+util.inspect(data));
-            assert(_.indexOf(data, 'beast1') === -1, 'expected `beast1` to have been removed from room membership list, but room membership is still: '+data);
+            assert.equal(rooms.length, 2, 'expected it to return a membership of 2 rooms; instead got '+util.inspect(rooms));
+            assert(_.indexOf(rooms, 'beast1') === -1, 'expected `beast1` to have been removed from room membership list, but room membership is still: '+rooms);
+            return done();
+          });
+        });
+        it('should warn and not error if passing in null socket', function(done) {
+          // Testing fix for #6
+          var origWarn = sails.log.warn;
+          var sawWarning = false;
+          sails.log.warn = function(msg) {
+            sawWarning = true;
+            origWarn.apply(this, arguments);
+            sails.log.warn = origWarn;
+          };
+          sails.sockets.leave(null);
+          assert.equal(sawWarning, true);
+          done();
+        });
+      });
+      describe('with a socket object as the first argument', function() {
+        it('should not crash', function(done) {
+          theKing.delete('/socketMethods/leave_with_socket', {
+            room: 'beast1'
+          }, function (data, jwr) {
+            if (jwr.error) return done(jwr.error);
             return done();
           });
         });
       });
-      it('should warn and not error if passing in null socket', function(done) {
-        // Testing fix for #6
-        var origWarn = sails.log.warn;
-        var sawWarning = false;
-        sails.log.warn = function(msg) {
-          sawWarning = true;
-          origWarn.apply(this, arguments);
-          sails.log.warn = origWarn;
-        };
-        sails.sockets.leave(null);
-        assert.equal(sawWarning, true);
-        done();
-      });
-    });
-    describe('with a socket object as the first argument', function() {
-      it('should not crash', function(done) {
-        theKing.delete('/socketMethods/leave_with_socket', {
-          room: 'beast1'
-        }, function (data, jwr) {
-          if (jwr.error) return done(jwr.error);
-          return done();
-        });
-      });
-    });
-    describe('with a socket id as the first argument', function() {
-      it('should not crash', function(done) {
-        theKing.delete('/socketMethods/leave_with_id', {
-          room: 'beast1'
-        }, function (data, jwr) {
-          if (jwr.error) return done(jwr.error);
-          return done();
+      describe('with a socket id as the first argument', function() {
+        it('should not crash', function(done) {
+          theKing.delete('/socketMethods/leave_with_id', {
+            room: 'beast1'
+          }, function (data, jwr) {
+            if (jwr.error) return done(jwr.error);
+            return done();
+          });
         });
       });
     });
@@ -600,131 +526,6 @@ describe('low-level socket methods:', function (){
 
   });
 
-  describe('sails.sockets.rooms()', function (done){
-    before(function(){
-      sails.get('/socketMethods/rooms', function(req, res){
-        var roomIds = sails.sockets.rooms();
-        return res.send(roomIds);
-      });
-    });
-    it('should not crash', function (done){
-      theKing.get('/socketMethods/rooms', function (data, jwr) {
-        if (jwr.error) return done(jwr.error);
-        assert(_.contains(data, 'beast2'), 'beast2 room should be in array returned from sails.sockets.rooms()');
-        assert(_.contains(data, 'test'), 'test room should be in array returned from sails.sockets.rooms()');
-        assert(_.contains(data, 'winterfell'), 'winterfell room should be in array returned from sails.sockets.rooms()');
-        return done();
-      });
-    });
-  });
-
-  describe('sails.sockets.subscribers() synchronous usage', function (done){
-    var sawWarning = false;
-    before(function(){
-      sails.get('/socketMethods/subscribers', function(req, res){
-        var origDebug = sails.log.debug;
-        sails.log.debug = function(msg) {
-          sawWarning = true;
-          origDebug.apply(this, arguments);
-          sails.log.debug = origDebug;
-        };
-        var idsOfRoomMembers = sails.sockets.subscribers('winterfell');
-        return res.send(idsOfRoomMembers);
-      });
-    });
-
-    // Look up the socket ids for each Stark
-    var starkSocketIds = {};
-    before(function (done){
-      async.each(_.keys(starks), function (key, next){
-        var clientSocket = starks[key];
-
-        // Lookup socket id
-        _getSocketId(clientSocket, function (err,socketId){
-          if (err) return next(err);
-          starkSocketIds[key] = socketId;
-          return next();
-        });
-      }, function afterwards(err) {
-        if (err) return done(err);
-        done();
-      });
-    });
-
-    it('should return all members of room', function (done){
-      theKing.get('/socketMethods/subscribers', function (data, jwr) {
-        if (jwr.error) return done(jwr.error);
-        _.each(starkSocketIds, function (socketId, firstName){
-          // skip ned
-          if (firstName === 'ned') {
-            return;
-          }
-          assert(_.contains(data, socketId), ''+firstName+' should be in array returned from sails.sockets.subscribers("winterfell")');
-        });
-        return done();
-      });
-    });
-
-    it('should show a deprecation warning', function() {
-      assert(sawWarning);
-    });
-  });
-
-  describe('sails.sockets.subscribers() asynchronous usage', function (done){
-    var sawWarning = false;
-    before(function(){
-      sails.get('/socketMethods/subscribersAsync', function(req, res){
-        var origDebug = sails.log.debug;
-        sails.log.debug = function(msg) {
-          sawWarning = true;
-          origDebug.apply(this, arguments);
-          sails.log.debug = origDebug;
-        };
-        sails.sockets.subscribers('winterfell', function(err, idsOfRoomMembers) {
-          if (err) {return res.serverError(err);}
-          return res.send(idsOfRoomMembers);
-        });
-      });
-    });
-
-    // Look up the socket ids for each Stark
-    var starkSocketIds = {};
-    before(function (done){
-      async.each(_.keys(starks), function (key, next){
-        var clientSocket = starks[key];
-
-        // Lookup socket id
-        _getSocketId(clientSocket, function (err,socketId){
-          if (err) return next(err);
-          starkSocketIds[key] = socketId;
-          return next();
-        });
-      }, function afterwards(err) {
-        if (err) return done(err);
-        done();
-      });
-    });
-
-    it('should return all members of room', function (done){
-      theKing.get('/socketMethods/subscribersAsync', function (data, jwr) {
-        if (jwr.error) return done(jwr.error);
-        _.each(starkSocketIds, function (socketId, firstName){
-          // skip ned
-          if (firstName === 'ned') {
-            return;
-          }
-          assert(_.contains(data, socketId), ''+firstName+' should be in array returned from sails.sockets.subscribers("winterfell")');
-        });
-        return done();
-      });
-    });
-
-
-    it('should show a deprecation warning', function() {
-      assert(sawWarning);
-    });
-
-  });
 
   describe('sails.sockets.blast()', function (){
     before(function(){

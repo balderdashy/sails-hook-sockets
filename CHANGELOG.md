@@ -1,5 +1,9 @@
 # sails-hook-sockets changelog
 
+### 0.13.8
+
+* [ENHANCEMENT] Added support for the "subEvent" option [#26](https://github.com/balderdashy/sails-hook-sockets/issues/26)
+
 ### 0.13.7
 
 * [BUGFIX] Correctly handle joining/leaving rooms using socket ID as the first argument [#22](https://github.com/balderdashy/sails-hook-sockets/issues/22)
