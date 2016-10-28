@@ -44,7 +44,6 @@ module.exports = {
       global.io = client;
 
       // Set some options.
-      global.io.sails.transports = ['websocket'];
       global.io.sails.url = 'http://localhost:'+TEST_SERVER_PORT;
       global.io.sails.environment = 'production'; //(to disable logging)
       global.io.sails.multiplex = false; // (to allow for clean testing of multiple connected sockets)
