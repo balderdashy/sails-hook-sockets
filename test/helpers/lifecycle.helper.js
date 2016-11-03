@@ -75,17 +75,13 @@ module.exports = {
     // TODO:
     // cancel the connection attempt if one exists-
     // or better yet, extend `disconnect()` to do this
-    if (!global.io || !global.io.socket || !global.io.socket.isConnected()) {
-      return done();
+    if (global.io && global.io.socket && global.io.socket.isConnected()) {
+      io.socket.disconnect();
     }
-
     // Disconnect socket
-    io.socket.disconnect();
     setTimeout(function ensureDisconnect () {
-
       // Ensure socket is actually disconnected
-      var isActuallyDisconnected = (global.io.socket.isConnected() === false);
-
+      var isActuallyDisconnected = (global.io && global.io.socket && global.io.socket.isConnected() === false);
       // Tear down sails server
       global._sails.lower(function (){
 
