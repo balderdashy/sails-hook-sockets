@@ -7,11 +7,15 @@ var assert = require('assert');
 var async = require('async');
 var _ = require('lodash');
 
+var lifecycle = require('./helpers/lifecycle.helper');
 var ERRORPACK = require('../lib/errors');
 
 
 
 describe('low-level socket methods:', function (){
+
+  before(lifecycle.setup);
+  after(lifecycle.teardown);
 
   var sails;
 
@@ -69,14 +73,6 @@ describe('low-level socket methods:', function (){
     });
 
   });
-
-  after(function (){
-    _.each(starks, function (starkSocket){
-      starkSocket.disconnect();
-    });
-  });
-
-
 
   // •----------------------------------------•
   //

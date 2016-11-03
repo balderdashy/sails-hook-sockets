@@ -5,9 +5,12 @@
 var _ = require('lodash');
 var Sails = require('sails').Sails;
 var Http = require('machinepack-http');
-
+var lifecycle = require('./helpers/lifecycle.helper');
 
 describe('with `serveClient` config enabled', function (){
+
+  before(lifecycle.setup);
+  after(lifecycle.teardown);
 
   // Common app config
   var appConfig = {

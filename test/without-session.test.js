@@ -11,10 +11,13 @@ var Sails = require('sails').Sails;
 var isProbablySocket = require('./helpers/is-probably-socket.helper');
 var isProbablySession = require('./helpers/is-probably-session.helper');
 
-
+var lifecycle = require('./helpers/lifecycle.helper');
 
 
 describe('without session', function (){
+
+  before(lifecycle.setup);
+  after(lifecycle.teardown);
 
   // Used to check state below in tests
   var numTimesOnConnectTriggered = 0;

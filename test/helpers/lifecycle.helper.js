@@ -2,8 +2,8 @@
  * Module dependencies
  */
 
+var _ = require('lodash');
 var Sails = require('sails').Sails;
-var socketioClient = require('socket.io-client');
 var sailsioClient = require('sails.io.js');
 
 
@@ -18,12 +18,23 @@ var TEST_SERVER_PORT = 1577;
 
 module.exports = {
 
-  setup: function (done) {
+  setup: function (config, done) {
 
     // New up an instance of Sails and lift it.
     var app = Sails();
 
-    app.lift({
+    if (typeof config === 'function') {
+      done = config;
+      config = null;
+    }
+
+    if (typeof done !== 'function') {
+      throw new Error('Did not supply a callback to the lifecycle setup!');
+    }
+
+    config = config || {};
+
+    app.lift(_.extend({
       port: TEST_SERVER_PORT,
       globals: false,
       log: { level: 'warn' },
@@ -31,13 +42,15 @@ module.exports = {
         // Inject the sockets hook in this repo into this Sails app
         sockets: require('../..')
       },
-      loadHooks: ['moduleloader', 'userconfig', 'http', 'session', 'sockets']
-    },function (err, sails) {
+      loadHooks: ['moduleloader', 'userconfig', 'http', 'session', 'sockets'],
+    }, config),function (err, sails) {
       if (err) return done(err);
 
       global._sails = sails;
 
       // Instantiate socket client.
+      delete require.cache[require.resolve('socket.io-client')];
+      var socketioClient = require('socket.io-client');
       var client = sailsioClient(socketioClient);
 
       // Globalize sails.io client as `io`
@@ -45,11 +58,9 @@ module.exports = {
 
       // Set some options.
       global.io.sails.url = 'http://localhost:'+TEST_SERVER_PORT;
+      global.io.sails.reconnection = false;
       global.io.sails.environment = 'production'; //(to disable logging)
       global.io.sails.multiplex = false; // (to allow for clean testing of multiple connected sockets)
-
-      // (Our app is already globalized as `sails` since we didn't disable
-      //  globals in the options above.)
 
       return done(err);
     });

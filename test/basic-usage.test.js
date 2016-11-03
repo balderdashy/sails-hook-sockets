@@ -4,9 +4,12 @@
 
 var assert = require('assert');
 var util = require('util');
-
+var lifecycle = require('./helpers/lifecycle.helper');
 
 describe('basic usage', function (){
+
+  before(lifecycle.setup);
+  after(lifecycle.teardown);
 
   var sails;
   before(function() {

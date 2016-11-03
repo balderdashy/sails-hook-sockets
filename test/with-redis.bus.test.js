@@ -8,8 +8,12 @@ var _ = require('lodash');
 var async = require('async');
 var Sails = require('sails').Sails;
 var SocketIORedisAdapter = require('socket.io-redis');
+var lifecycle = require('./helpers/lifecycle.helper');
 
 describe('with redis -- bus', function (){
+
+  before(lifecycle.setup);
+  after(lifecycle.teardown);
 
   // Common app config
   var appConfig = {

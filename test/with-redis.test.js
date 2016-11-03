@@ -8,6 +8,7 @@ var _ = require('lodash');
 var async = require('async');
 var Sails = require('sails').Sails;
 var SocketIORedisAdapter = require('socket.io-redis');
+var lifecycle = require('./helpers/lifecycle.helper');
 
 // TODO:
 // figure out how to make this run on Travis
@@ -15,6 +16,9 @@ var SocketIORedisAdapter = require('socket.io-redis');
 
 
 describe('with redis', function (){
+
+  before(lifecycle.setup);
+  after(lifecycle.teardown);
 
   // Common app config
   var appConfig = {

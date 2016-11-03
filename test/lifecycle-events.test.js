@@ -8,10 +8,14 @@ var util = require('util');
 var _ = require('lodash');
 var sails = require('sails');
 
+var lifecycle = require('./helpers/lifecycle.helper');
 var isProbablySocket = require('./helpers/is-probably-socket.helper');
 var isProbablySession = require('./helpers/is-probably-session.helper');
 
 describe('lifecycle events', function (){
+
+  before(lifecycle.setup);
+  after(lifecycle.teardown);
 
   // Used to check state below in tests
   var numTimesOnConnectTriggered = 0;

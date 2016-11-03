@@ -3,10 +3,13 @@
  */
 
 var assert = require('assert');
-
+var lifecycle = require('./helpers/lifecycle.helper');
 
 
 describe('with session', function (){
+
+  before(lifecycle.setup);
+  after(lifecycle.teardown);
 
   var sails;
 
@@ -44,11 +47,6 @@ describe('with session', function (){
     });
     secondSocket.on('connect', function(){ done(); });
   });
-
-  after(function (){
-    secondSocket.disconnect();
-  });
-
 
   it('should not expose "set-cookie" response header', function (done){
     io.socket.put('/me/jamiroquai', function (unused, jwr) {

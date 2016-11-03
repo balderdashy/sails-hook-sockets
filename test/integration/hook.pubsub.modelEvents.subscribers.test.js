@@ -1,10 +1,16 @@
 var assert = require('assert');
 var util = require('util');
 var _ = require('lodash');
+var lifecycle = require('../helpers/lifecycle.helper');
 
 describe('when posting json arrays', function () {
 
   var sails;
+
+  // Set up "before all" and "after all"
+  before(lifecycle.setup);
+  after(lifecycle.teardown);
+
   before(function() {
     sails = global._sails;
   });
