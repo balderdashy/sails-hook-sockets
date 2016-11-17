@@ -23,6 +23,9 @@ node_js:
 branches:
   only:
     - master
+    - for-sails-v0.12
+
+before_script: sudo redis-server /etc/redis/redis.conf --port 6380 --requirepass 'secret'
 
 notifications:
   email:
