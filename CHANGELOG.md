@@ -1,12 +1,26 @@
 # sails-hook-sockets changelog
 
-### 0.13.8
+### 1.1.0
 
-* [ENHANCEMENT] Added support for the "subEvent" option [#26](https://github.com/balderdashy/sails-hook-sockets/issues/26)
+* [UPGRADE] Update [socket.io](http://socket.io) dependency to version 1.5.1.
+* [ENHANCEMENT] Add validation for `db` option.  Thanks [bberry6](https://github.com/bberry6)!  [#9](https://github.com/balderdashy/sails-hook-sockets/pull/9)
+* [ENHANCEMENT] Add `onlyAllowOrigins` config to restrict the origins allowed to connect to the socket server. [9450c96](https://github.com/balderdashy/sails-hook-sockets/commit/9450c96cd22b2ca49696cfbebc5d46b54a08b97c)
+
+### 1.0.1
+
+* [BUGFIX] Made `maxHttpBufferSize` actually work by passing through to the underlying adapter. [f5bf545](https://github.com/balderdashy/sails-hook-sockets/commit/f5bf54595d388f4dcdb739a5fc5613c7255d6014)
+* [DEPRECATION] Deprecated `maxBufferSize` option in favor of `maxHttpBufferSize`. [f5bf545](https://github.com/balderdashy/sails-hook-sockets/commit/f5bf54595d388f4dcdb739a5fc5613c7255d6014)
+* [ENHANCEMENT] Make "websocket" the default transport.  This is better supported by more clients than the "polling-first" method.  The relevant changes have been made in [sails.io.js](http://github.com/balderdashy/sails.io.js) as well. [8135ada](https://github.com/balderdashy/sails-hook-sockets/commit/8135adae8ec04e99facf84e38803b95fa3c79f90)
+
+### 1.0.0
+
+* **[BREAKING CHANGE]** Removed deprecated `sails.socket` methods: `.emit()`, `.emitToAll()`, `.rooms()`, `.socketRooms()`, `.subscribers()`, `.id()`.
+* [ENHANCEMENT] Added support for the "subEvent" option.  Thanks [@albi34](https://github.com/albi34)! [#26](https://github.com/balderdashy/sails-hook-sockets/issues/26)
+* [BUGFIX] Explicitly set content-type when responding to JSONP request.  Thanks [@arryon](https://github.com/arryon)! [#28](https://github.com/balderdashy/sails-hook-sockets/pull/28)
 
 ### 0.13.7
 
-* [BUGFIX] Correctly handle joining/leaving rooms using socket ID as the first argument [#22](https://github.com/balderdashy/sails-hook-sockets/issues/22)
+* [BUGFIX] Correctly handle joining/leaving rooms using socket ID as the first argument. Thanks [@Biktop](https://github.com/Biktop)! [#22](https://github.com/balderdashy/sails-hook-sockets/issues/22)
 
 ### 0.13.6
 
