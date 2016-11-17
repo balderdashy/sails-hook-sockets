@@ -2,59 +2,56 @@
 
 Implements Socket.io support in Sails.
 
-> This is a core hook in the Sails.js framework.  You can override or disable it using your sailsrc file or environment variables.  See http://sailsjs.org/documentation/concepts/configuration for more information.
-
-## Status
-
-> ##### Stability: [2](https://github.com/balderdashy/sails-docs/blob/master/contributing/stability-index.md) - Stable
+> This is a core hook in the [Sails.js framework](http://sailsjs.com).  You can override or disable it using your `.sailsrc` file or environment variables.  See [Concepts > Configuration](http://sailsjs.com/documentation/concepts/configuration) for more information.
 
 
-## Purpose
+## Help
 
-This hook's responsibilities are:
-
-#### When initialized...
-+ fire up socket.io server
-+ listen for connect / disconnect events
-  + listen for get/post/put/delete/patch events
-    + create bare-bones request and response contexts, then pass them to the core interpreter in Sails to be routed on the fly.
-
-#### Bind "shadow" routes...
-
-###### `before`
-N/A
-
-###### `after`
-
-+ `GET __getcookie`
-
-
-#### Expose on the `sails` app object:
-
-+ `sails.sockets.*` (see reference documentation for sails.sockets on sailsjs.org for full list of exposed methods)
-
-## FAQ
-
-> If you have a question that isn't covered here, please feel free to send a PR adding it to this section.
-
-#### What is this?
-
-This repo contains a hook, one of the building blocks Sails is made out of.
+If you have further questions or are having trouble, click [here](http://sailsjs.com/support).
 
 #### What version of Sails is this for?
 
-This hook is a dependency of Sails core as of v0.11.
+This hook is for Sails v1.0 and up.
 
-#### Does this hook use Socket.io v1.0?
+> Prior to Sails v1.0, this hook was a dependency of Sails core.  But now, it is now installed as a direct dependency of your Sails app.
 
-Yes.
+#### What is this?  What does it do?
 
-#### Are there changes?
+This repo contains a hook, one of the building blocks Sails is made out of.
 
-Yes, see the [v0.11 migration guide](http://sailsjs.org/#!/documentation/concepts/Upgrading). You probably won't need to change anything unless you were extensively using the old Socket.io v0.9 configuration.
+This hook's responsibilities are:
+
++ **When initialized...**
+  + fire up socket.io server
+  + listen for connect / disconnect events
+    + listen for get/post/put/delete/patch events
+      + create bare-bones request and response contexts, then pass them to the core interpreter in Sails to be routed on the fly.
+  + Bind `after` "shadow" routes...
+    + `GET /__getcookie`
+  + Expose on the `sails` app object:
+    + `sails.sockets.*` _(see [Reference > WebSockets > sails.sockets](http://sailsjs.com/documentation/reference/web-sockets/sails-sockets))_
 
 
-## Running the tests
+#### What version of Socket.io does this hook use?
+
+Click [here](./package.json) to check out the semver range for this hook's Socket.io dependency.
+
+> For reproducibility, we always pin 3rd party dependencies to a specific version, using a consistent verified version string when possible (see [kit](http://github.com/mikermcneil/kit)).
+
+
+#### Bugs &nbsp; [![NPM version](https://badge.fury.io/js/sails-hook-sockets.svg)](http://npmjs.com/package/sails-hook-sockets)
+
+To report a bug, [click here](http://sailsjs.com/bugs).
+
+
+## Contributing
+
+Please observe the guidelines and conventions laid out in the [Sails project contribution guide](http://sailsjs.com/contribute) when opening issues or submitting pull requests.
+
+[![NPM](https://nodei.co/npm/sails-hook-sockets.png?downloads=true)](http://npmjs.com/package/sails-hook-sockets)
+
+
+#### Running the tests
 
 First, clone this repo, cd into it, and install dependencies:
 
@@ -64,7 +61,7 @@ cd sails-hook-sockets
 npm install
 ```
 
-#### Run them all
+##### Run them all
 
 To run all the tests, start a local redis server on port 6380 and then run the tests using mocha:
 
@@ -74,7 +71,7 @@ npm test
 ```
 
 
-#### Run only certain tests
+##### Run only certain tests
 
 Alternatively, you can run a particular set of tests with:
 
@@ -86,8 +83,7 @@ node ./node_modules/mocha/bin/mocha -g 'without session'
 
 
 
-
-
 ## License
 
-MIT
+The [Sails framework](http://sailsjs.com) is free and open-source under the [MIT License](http://sailsjs.com/license).
+
