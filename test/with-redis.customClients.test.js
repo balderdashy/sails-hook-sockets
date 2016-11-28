@@ -91,9 +91,11 @@ describe('with redis -- custom clients', function (){
   });
   after(function (done){
     adminPubClient.send_command('client', ['kill', 'type', 'pubsub'], function(err) {
-      async.each(apps, function (app, next){
-        app.lower(next);
-      }, done);
+      adminPubClient.send_command('client', ['kill', 'skipme', 'no'], function(err) {
+        async.each(apps, function (app, next){
+          app.lower(next);
+        }, done);
+      });
     });
   });
 
