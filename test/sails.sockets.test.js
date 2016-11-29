@@ -5,7 +5,7 @@
 var util = require('util');
 var assert = require('assert');
 var async = require('async');
-var _ = require('lodash');
+var _ = require('@sailshq/lodash');
 
 var lifecycle = require('./helpers/lifecycle.helper');
 var ERRORPACK = require('../lib/errors');

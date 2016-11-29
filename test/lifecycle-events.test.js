@@ -5,7 +5,7 @@
 var assert = require('assert');
 var util = require('util');
 
-var _ = require('lodash');
+var _ = require('@sailshq/lodash');
 var sails = require('sails');
 
 var lifecycle = require('./helpers/lifecycle.helper');

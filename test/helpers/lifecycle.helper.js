@@ -2,7 +2,7 @@
  * Module dependencies
  */
 
-var _ = require('lodash');
+var _ = require('@sailshq/lodash');
 var Sails = require('sails').Sails;
 var sailsioClient = require('sails.io.js');
 

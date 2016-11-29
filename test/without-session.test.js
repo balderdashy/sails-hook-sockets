@@ -5,7 +5,7 @@
 var assert = require('assert');
 var util = require('util');
 
-var _ = require('lodash');
+var _ = require('@sailshq/lodash');
 var Sails = require('sails').Sails;
 
 var isProbablySocket = require('./helpers/is-probably-socket.helper');

@@ -4,7 +4,7 @@
 
 var Path = require('path');
 var async = require('async');
-var _ = require('lodash');
+var _ = require('@sailshq/lodash');
 var Sails = require('sails').Sails;
 var Filesystem = require('machinepack-fs');
 
