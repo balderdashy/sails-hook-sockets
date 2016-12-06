@@ -45,15 +45,11 @@ describe('with redis -- custom clients', function (){
       sockets: {
         adapter: 'socket.io-redis',
         adapterModule: SocketIORedisAdapter,
-        adapterOptions: {
-          subEvent: 'messageBuffer',
-          pubClient: pubClient,
-          subClient: subClient
-        },
-        adminAdapterOptions: {
-          pubClient: adminPubClient,
-          subClient: adminSubClient
-        }
+        subEvent: 'messageBuffer',
+        pubClient: pubClient,
+        subClient: subClient,
+        adminPubClient: adminPubClient,
+        adminSubClient: adminSubClient
       },
 
       routes: {
