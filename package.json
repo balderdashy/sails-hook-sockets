@@ -9,12 +9,12 @@
     "hook"
   ],
   "dependencies": {
+    "@sailshq/lodash": "^3.10.2",
     "async": "2.0.1",
     "flaverr": "^1.0.0",
-    "@sailshq/lodash": "^3.10.2",
     "machinepack-urls": "^3.1.1",
     "semver": "4.3.6",
-    "socket.io": "1.5.1",
+    "socket.io": "1.7.1",
     "uid2": "0.0.3"
   },
   "devDependencies": {
