@@ -45,7 +45,7 @@ describe('with redis', function (){
       //
       // Configure password to match .travis.yml
       pass: 'secret',
-      // db: 'sails'
+      db: 2
     },
 
     routes: {
