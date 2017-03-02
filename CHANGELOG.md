@@ -1,5 +1,17 @@
 # sails-hook-sockets changelog
 
+### 0.13.10
+
+* [ENCHANCEMENT] Upgrade socket.io to version 1.7.2. [12b9a87](https://github.com/balderdashy/sails-hook-sockets/commit/12b9a879f01cbba8a67bdbafeb05c09e3e694510)
+
+### 0.13.9
+
+* [ENCHANCEMENT] Upgrade socket.io to version 1.5.1. [d401051](https://github.com/balderdashy/sails-hook-sockets/commit/d40105190ec9a4e0c4a6e25c1077c285b7328e49)
+
+### 0.13.8
+
+* [DEPRECATION] Deprecate `config.sockets.maxBufferSize` in favor of `config.sockets.maxHttpBufferSize` [83808fd](https://github.com/balderdashy/sails-hook-sockets/commit/83808fdb49e69f3f8aea1d5d3f810a6ddbbbf76f)
+
 ### 0.13.7
 
 * [BUGFIX] Correctly handle joining/leaving rooms using socket ID as the first argument [#22](https://github.com/balderdashy/sails-hook-sockets/issues/22)
