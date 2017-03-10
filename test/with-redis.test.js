@@ -107,7 +107,7 @@ describe('with redis', function (){
 
       'PUT /testroom/joinPlayroom': function (req, res) {
         req._sails.sockets.addRoomMembersToRooms('testroom', 'playroom', function(err) {
-          if (err) {return res.serverError(err);}
+          if (err) {return res.send(err);}
           // Add slight delay to allow all servers to react
           setTimeout(function(){res.send();}, 100);
         });
@@ -115,7 +115,7 @@ describe('with redis', function (){
 
       'PUT /testroom/leavePlayroom': function (req, res) {
         req._sails.sockets.removeRoomMembersFromRooms('testroom', 'playroom', function(err) {
-          if (err) {return res.serverError(err);}
+          if (err) {return res.send(err);}
           // Add slight delay to allow all servers to react
           setTimeout(function(){res.send();}, 100);
         });
@@ -123,7 +123,7 @@ describe('with redis', function (){
 
       'PUT /leaveAllRooms': function (req, res) {
         req._sails.sockets.leaveAll('testroom', function(err) {
-          if (err) {return res.serverError(err);}
+          if (err) {return res.send(err);}
           // Add slight delay to allow all servers to react
           setTimeout(function(){res.send();}, 100);
         });
