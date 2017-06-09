@@ -36,8 +36,8 @@ test_script:
   #  But seriously, always good to audit this kind of stuff for debugging.)
   - node --version
   - npm --version
-  # Run the actual tests.
-  - npm test
+  # Run the actual tests (minus eslint)
+  - npm run custom-tests
 
 
 # Don't actually build.
