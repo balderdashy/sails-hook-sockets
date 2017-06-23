@@ -169,7 +169,6 @@ describe('with redis -- errors', function (){
         // Configure port to match .travis.yml
         port: 6380,
 
-        // Should fail, because by default Redis only has 16 dbs
         db: 2,
 
         // Configure password to match .travis.yml
