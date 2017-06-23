@@ -30,7 +30,7 @@
     "socket.io-redis": "3.1.0"
   },
   "scripts": {
-    "test": "node ./node_modules/mocha/bin/mocha test/** --timeout 5000"
+    "test": "node ./node_modules/mocha/bin/mocha test --timeout 5000"
   },
   "main": "index.js",
   "repository": {
