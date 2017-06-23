@@ -38,6 +38,7 @@ lib-cov
 .idea
 .netbeans
 nbproject
+package-lock.json
 
 ############################
 # misc

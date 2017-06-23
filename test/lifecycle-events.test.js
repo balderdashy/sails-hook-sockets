@@ -43,6 +43,12 @@ describe('lifecycle events', function (){
       loadHooks: ['moduleloader', 'userconfig', 'http', 'session', 'sockets'],
       sockets: {
         beforeConnect: function (handshake, cb) {
+          if (handshake._query.reject) {
+            return cb('foo', false);
+          }
+          if (handshake._query.error) {
+            throw new Error('errored!');
+          }
           numTimesOnConnectTriggered++;
           onConnectArgs = Array.prototype.slice.call(arguments);
           return cb(null, true);
@@ -54,8 +60,7 @@ describe('lifecycle events', function (){
         }
       }
     },function (err) {
-      if (err) return done(err);
-
+      if (err) { return done(err); }
       return done(err);
     });
   });
@@ -72,7 +77,7 @@ describe('lifecycle events', function (){
   describe('when a new socket is connected', function (){
 
     it('should trigger onConnect lifecycle event', function (done){
-      newSocket = io.sails.connect('http://localhost:'+1684, {
+      newSocket = io.sails.connect('http://localhost:1684', {
         multiplex: false
       });
       newSocket.on('connect', function (){
@@ -136,6 +141,131 @@ describe('lifecycle events', function (){
     });
   });
 
+  describe('when rejecting a socket connection', function() {
+    it('should trigger connect_error event', function (done){
+      newSocket = io.sails.connect('http://localhost:1684?reject=true', {
+        multiplex: false
+      });
+      newSocket.on('connect', function (){
+        return done(new Error('should not have connected!'));
+      });
+      newSocket.on('connect_error', function (err){
+        return done();
+      });
+    });
+  });
 
+  describe('when throwing in the `beforeConnect`', function() {
+    it('should trigger connect_error event', function (done){
+      newSocket = io.sails.connect('http://localhost:1684?error=true', {
+        multiplex: false
+      });
+      newSocket.on('connect', function (){
+        return done(new Error('should not have connected!'));
+      });
+      newSocket.on('connect_error', function (err){
+        return done();
+      });
+    });
+  });
 
 });
+
+if (Number(process.version.match(/^v(\d+\.\d+)/)[1]) >= 7.6) {
+  describe('lifecycle events (using async/await)', function (){
+
+    before(lifecycle.setup);
+    after(lifecycle.teardown);
+
+    // Used to check state below in tests
+    var numTimesOnConnectTriggered = 0;
+    var numTimesOnDisconnectTriggered = 0;
+    var onConnectArgs;
+    var onDisconnectArgs;
+
+    var app;
+
+    // Define a dumb async function.
+    var dumb = function (status) {
+      return new Promise(function (resolve, reject) {
+        setTimeout(function() {
+          if (status === 'ok') {
+            return resolve();
+          }
+          if (status === 'reject') {
+            return reject();
+          }
+        }, 100);
+      });
+    };
+
+    // Since we have to set up a separate app instance to test this,
+    // we just do that inline here
+    before(function (done){
+
+      // New up an instance of Sails and lift it.
+      app = sails.Sails();
+
+      app.lift({
+        port: 1684,
+        log: { level: 'warn' },
+        globals: false,
+        hooks: {
+          // Inject the sockets hook in this repo into this Sails app
+          sockets: require('../')
+        },
+        loadHooks: ['moduleloader', 'userconfig', 'http', 'session', 'sockets'],
+        sockets: {
+          beforeConnect: require('./helpers/async-beforeconnect'),
+          afterDisconnect: function(session, socket, cb) {
+            numTimesOnDisconnectTriggered++;
+            onDisconnectArgs = Array.prototype.slice.call(arguments);
+            return cb();
+          }
+        }
+      },function (err) {
+        if (err) { return done(err); }
+        return done(err);
+      });
+    });
+
+    after(function (done){
+      app.lower(function () {
+        return done();
+      });
+    });
+
+
+    var newSocket;
+
+    describe('when rejecting a socket connection', function() {
+      it('should trigger connect_error event', function (done){
+        newSocket = io.sails.connect('http://localhost:1684?status=reject', {
+          multiplex: false
+        });
+        newSocket.on('connect', function (){
+          return done(new Error('should not have connected!'));
+        });
+        newSocket.on('connect_error', function (err){
+          return done();
+        });
+      });
+    });
+
+    describe('when throwing in the `beforeConnect` function', function() {
+      it('should trigger connect_error event', function (done){
+        newSocket = io.sails.connect('http://localhost:1684?status=error', {
+          multiplex: false
+        });
+        newSocket.on('connect', function (){
+          return done(new Error('should not have connected!'));
+        });
+        newSocket.on('connect_error', function (err){
+          return done();
+        });
+      });
+    });
+
+
+  });
+}
