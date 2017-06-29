@@ -203,11 +203,7 @@ if (Number(process.version.match(/^v(\d+\.\d+)/)[1]) >= 7.6) {
         loadHooks: ['moduleloader', 'userconfig', 'http', 'session', 'sockets'],
         sockets: {
           beforeConnect: require('./helpers/async-beforeconnect'),
-          afterDisconnect: function(session, socket, cb) {
-            numTimesOnDisconnectTriggered++;
-            onDisconnectArgs = Array.prototype.slice.call(arguments);
-            return cb();
-          }
+          afterDisconnect: require('./helpers/async-afterdisconnect')
         }
       },function (err) {
         if (err) { return done(err); }
@@ -252,6 +248,21 @@ if (Number(process.version.match(/^v(\d+\.\d+)/)[1]) >= 7.6) {
       });
     });
 
+    describe('when throwing in the `afterDisconnect` function', function() {
+      it('should not crash (but should log disconnect error to console)', function (done){
+        newSocket = io.sails.connect('http://localhost:1684?status=ok&disconnect=error', {
+          multiplex: false
+        });
+        newSocket.on('connect', function (){
+          newSocket.disconnect();
+          return done();
+        });
+        newSocket.on('connect_error', function (err){
+          return done(err);
+        });
+
+      });
+    });
 
   });
 }
