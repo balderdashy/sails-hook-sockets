@@ -185,20 +185,6 @@ if (Number(process.version.match(/^v(\d+\.\d+)/)[1]) >= 7.6) {
 
     var app;
 
-    // Define a dumb async function.
-    var dumb = function (status) {
-      return new Promise(function (resolve, reject) {
-        setTimeout(function() {
-          if (status === 'ok') {
-            return resolve();
-          }
-          if (status === 'reject') {
-            return reject();
-          }
-        }, 100);
-      });
-    };
-
     // Since we have to set up a separate app instance to test this,
     // we just do that inline here
     before(function (done){
