@@ -23,6 +23,7 @@
     "machinepack-fs": "^3.0.0",
     "machinepack-http": "^2.1.2",
     "mocha": "3.1.0",
+    "proxy-addr": "1.1.5",
     "redis": "2.6.3",
     "sails": "^1.0.0-12",
     "sails.io.js": "^1.0.0",
