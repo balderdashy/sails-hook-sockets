@@ -2,6 +2,7 @@
  * Module dependencies
  */
 
+var assert = require('assert');
 var _ = require('@sailshq/lodash');
 var Sails = require('sails').Sails;
 var Http = require('machinepack-http');
@@ -66,7 +67,8 @@ describe('with `serveClient` config enabled', function (){
           return done(err);
         },
         // 400 status code returned from server
-        badRequest: function(result) {
+        non200Response: function(result) {
+          assert.equal(result.statusCode, 400);
           return done();
         },
         // OK.
@@ -90,10 +92,8 @@ describe('with `serveClient` config enabled', function (){
         error: function(err) {
           return done(err);
         },
-        badRequest: function(err) {console.log(err); done(err);},
-        // 404 status code returned from server
-        notFound: function(result) {
-          return done(new Error('Expecting 200- the socket.io.js client SHOULD BE SERVED automatically since `serveClient` is explicitly enabled!'));
+        non200Response: function(err) {
+          return done(err);
         },
         // OK.
         success: function(result) {
