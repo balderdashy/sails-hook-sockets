@@ -16,7 +16,6 @@
     "machinepack-urls": "^3.1.1",
     "semver": "4.3.6",
     "socket.io": "2.0.3",
-    "socket.io-client": "2.0.3",
     "uid2": "0.0.3"
   },
   "devDependencies": {
@@ -28,8 +27,8 @@
     "redis": "2.6.3",
     "sails": "^1.0.0-12",
     "sails.io.js": "^1.0.0",
-    "socket.io-client": "1.7.3",
-    "socket.io-redis": "^5.2.0"
+    "socket.io-client": "2.0.3",
+    "socket.io-redis": "5.2.0"
   },
   "scripts": {
     "test": "node ./node_modules/mocha/bin/mocha test --timeout 5000"
