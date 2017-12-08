@@ -16,6 +16,7 @@
     "machinepack-urls": "^3.1.1",
     "semver": "4.3.6",
     "socket.io": "2.0.3",
+    "proxy-addr": "1.1.5",
     "uid2": "0.0.3"
   },
   "devDependencies": {
@@ -23,7 +24,6 @@
     "machinepack-fs": "^3.0.0",
     "machinepack-http": "^3.1.2",
     "mocha": "3.1.0",
-    "proxy-addr": "1.1.5",
     "redis": "2.6.3",
     "sails": "^1.0.0-12",
     "sails.io.js": "^1.0.0",
