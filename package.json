@@ -13,7 +13,7 @@
     "async": "2.0.1",
     "flaverr": "^1.0.0",
     "machinepack-redis": "^1.1.1",
-    "machinepack-urls": "^3.1.1",
+    "machinepack-urls": "^6.0.2-0",
     "semver": "4.3.6",
     "socket.io": "2.0.3",
     "proxy-addr": "1.1.5",
