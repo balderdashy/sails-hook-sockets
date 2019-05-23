@@ -22,7 +22,7 @@
   "devDependencies": {
     "ioredis": "2.4.0",
     "machinepack-fs": "^3.0.0",
-    "machinepack-http": "^3.1.2",
+    "machinepack-http": "^8.0.0",
     "mocha": "3.1.0",
     "redis": "2.6.3",
     "sails": "^1.0.0-12",
