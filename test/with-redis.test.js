@@ -15,7 +15,7 @@ var lifecycle = require('./helpers/lifecycle.helper');
 // (need a local redis)
 
 
-describe('with redis', function (){
+(require('os').platform() === 'win32' ? describe.skip : describe)('with redis', function (){
 
   before(lifecycle.setup);
   after(lifecycle.teardown);

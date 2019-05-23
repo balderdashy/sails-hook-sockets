@@ -12,7 +12,7 @@ var ioredis = require('ioredis');
 var redis = require('redis');
 var lifecycle = require('./helpers/lifecycle.helper');
 
-describe('with redis -- custom clients', function (){
+(require('os').platform() === 'win32' ? describe.skip : describe)('with redis -- custom clients', function (){
 
   var appConfig;
   var pubClient, subClient, adminPubClient, adminSubClient;
