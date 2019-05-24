@@ -12,7 +12,7 @@ var ioredis = require('ioredis');
 var redis = require('redis');
 var lifecycle = require('./helpers/lifecycle.helper');
 
-(require('os').platform() === 'win32' ? describe.skip : describe)('with redis -- custom clients', function (){
+describe('with redis -- custom clients', function (){
 
   var appConfig;
   var pubClient, subClient, adminPubClient, adminSubClient;
@@ -99,7 +99,7 @@ var lifecycle = require('./helpers/lifecycle.helper');
     });
   });
 
-  describe('all apps', function (){
+  (require('os').platform() === 'win32' ? describe.skip : describe)('all apps', function (){
 
     describe('after each app has at least one socket connected', function (){
 
