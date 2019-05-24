@@ -11,7 +11,7 @@ var SocketIORedisAdapter = require('socket.io-redis');
 var lifecycle = require('./helpers/lifecycle.helper');
 
 
-(require('os').platform() === 'win32' ? describe.skip : describe)('with redis', function (){
+describe('with redis', function (){
 
   before(lifecycle.setup);
   after(lifecycle.teardown);
