@@ -10,7 +10,7 @@ var Sails = require('sails').Sails;
 var SocketIORedisAdapter = require('socket.io-redis');
 var lifecycle = require('./helpers/lifecycle.helper');
 
-describe('with redis -- bus', function (){
+(require('os').platform() === 'win32' ? describe.skip : describe)('with redis -- bus', function (){
 
   before(lifecycle.setup);
   after(lifecycle.teardown);
@@ -73,7 +73,7 @@ describe('with redis -- bus', function (){
     }, done);
   });
 
-  (require('os').platform() === 'win32' ? describe.skip : describe)('all apps', function (){
+  describe('all apps', function (){
 
     describe('after each app has at least one socket connected', function (){
 
