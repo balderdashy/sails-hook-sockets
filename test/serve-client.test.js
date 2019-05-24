@@ -58,8 +58,7 @@ describe('with `serveClient` config enabled', function (){
 
       // Send an HTTP request and receive the response.
       Http.sendHttpRequest({
-        url: '/socket.io/socket.io.js',
-        baseUrl: 'http://localhost:1600',
+        url: 'http://localhost:1600/socket.io/socket.io.js',
         method: 'get'
       }).switch({
         // An unexpected error occurred.
@@ -84,8 +83,7 @@ describe('with `serveClient` config enabled', function (){
 
       // Send an HTTP request and receive the response.
       Http.sendHttpRequest({
-        url: '/socket.io/socket.io.js',
-        baseUrl: 'http://localhost:1601',
+        url: 'http://localhost:1601/socket.io/socket.io.js',
         method: 'get'
       }).switch({
         // An unexpected error occurred.
