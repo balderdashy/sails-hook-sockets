@@ -61,7 +61,7 @@ describe('with `serveClient` config enabled', function (){
         url: '/socket.io/socket.io.js',
         baseUrl: 'http://localhost:1600',
         method: 'get'
-      }).switch({
+      }).exec({
         // An unexpected error occurred.
         error: function(err) {
           return done(err);
@@ -87,7 +87,7 @@ describe('with `serveClient` config enabled', function (){
         url: '/socket.io/socket.io.js',
         baseUrl: 'http://localhost:1601',
         method: 'get'
-      }).switch({
+      }).exec({
         // An unexpected error occurred.
         error: function(err) {
           return done(err);
