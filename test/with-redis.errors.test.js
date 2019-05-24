@@ -10,7 +10,7 @@ var Sails = require('sails').Sails;
 var SocketIORedisAdapter = require('socket.io-redis');
 var lifecycle = require('./helpers/lifecycle.helper');
 
-describe('with redis -- errors', function (){
+(require('os').platform() === 'win32' ? describe.skip : describe)('with redis -- errors', function (){
 
   before(lifecycle.setup);
   after(lifecycle.teardown);
