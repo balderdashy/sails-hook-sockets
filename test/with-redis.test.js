@@ -10,12 +10,8 @@ var Sails = require('sails').Sails;
 var SocketIORedisAdapter = require('socket.io-redis');
 var lifecycle = require('./helpers/lifecycle.helper');
 
-// TODO:
-// figure out how to make this run on Travis
-// (need a local redis)
 
-
-describe('with redis', function (){
+(require('os').platform() === 'win32' ? describe.skip : describe)('with redis', function (){
 
   before(lifecycle.setup);
   after(lifecycle.teardown);

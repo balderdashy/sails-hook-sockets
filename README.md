@@ -66,7 +66,7 @@ npm install
 To run all the tests, start a local redis server on port 6380 and then run the tests using mocha:
 
 ```sh
-redis-server --port 6380
+redis-server --port 6380 --requirepass 'secret'
 npm test
 ```
 
