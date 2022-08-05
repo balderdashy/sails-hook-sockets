@@ -1,5 +1,15 @@
 # sails-hook-sockets changelog
 
+### 2.0.1
+
+* Upgraded socket.io from 2.2.0 to 2.4.1 to resolve deprecation warning
+
+### 2.0.0
+
+* Upgraded machinepack-redis to resolve vulnerability/deprecation warnings (note this includes a major version bump of redis, the Redis client library)
+* Upgraded machinepack-urls to resolve vulnerability/deprecation warnings
+* Upgraded socket.io from 2.0.3 to 2.2.0 to resolve deprecation warning
+
 ### 1.1.0
 
 * [UPGRADE] Update [socket.io](http://socket.io) dependency to version 1.5.1.
