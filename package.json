@@ -10,7 +10,7 @@
   ],
   "dependencies": {
     "@sailshq/lodash": "^3.10.2",
-    "async": "2.0.1",
+    "async": "2.6.4",
     "flaverr": "^1.0.0",
     "machinepack-redis": "^2.0.3",
     "machinepack-urls": "^6.0.2-0",
