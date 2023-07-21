@@ -15,7 +15,7 @@
     "machinepack-redis": "^2.0.3",
     "machinepack-urls": "^6.0.2-0",
     "proxy-addr": "1.1.5",
-    "semver": "4.3.6",
+    "semver": "7.5.2",
     "socket.io": "2.5.0",
     "uid2": "0.0.3"
   },
