@@ -58,7 +58,7 @@ describe('req.ip', function (){
       });
       newSocket.on('connect', function (){
         newSocket.get('/', function(resp) {
-          assert.equal(resp, '::ffff:127.0.0.1');
+          assert.equal(resp, '::1');
           return done();
         });
       });
@@ -115,7 +115,7 @@ describe('req.ip', function (){
       });
       newSocket.on('connect', function (){
         newSocket.get('/', function(resp) {
-          assert.equal(resp, '::ffff:127.0.0.1');
+          assert.equal(resp, '::1');
           return done();
         });
       });
