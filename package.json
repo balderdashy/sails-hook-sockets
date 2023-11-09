@@ -28,7 +28,7 @@
     "sails": "^1.0.0-12",
     "sails.io.js": "^1.0.0",
     "socket.io-client": "2.0.3",
-    "socket.io-redis": "6.0.0"
+    "socket.io-redis": "6.1.0"
   },
   "scripts": {
     "test": "node ./node_modules/mocha/bin/mocha test --timeout 5000"
