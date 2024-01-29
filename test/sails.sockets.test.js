@@ -238,8 +238,8 @@ describe('low-level socket methods:', function (){
             if (err) {return res.serverError(err);}
             var socket = sails.sockets.parseSocket(req.socket);
             // Return the list of rooms this socket is assigned to.
-            // Since socket.io v1.4, rooms is an object
-            var rooms = _.keys(socket.rooms);
+            // Since socket.io v3.x, rooms is an set
+            var rooms = Array.from(socket.rooms);
             return res.json(rooms);
           });
         });
