@@ -16,7 +16,7 @@
     "machinepack-urls": "^6.0.2-0",
     "proxy-addr": "1.1.5",
     "semver": "7.5.2",
-    "socket.io": "4.7.2",
+    "socket.io": "4.7.5",
     "uid2": "0.0.3"
   },
   "devDependencies": {
