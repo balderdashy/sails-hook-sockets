@@ -39,7 +39,8 @@
     "url": "git://github.com/balderdashy/sails-hook-sockets.git"
   },
   "sails": {
-    "isHook": true
+    "isHook": true,
+    "hookName": "sockets"
   },
   "author": "Mike McNeil",
   "license": "MIT"
