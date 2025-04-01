@@ -1,5 +1,30 @@
 # sails-hook-sockets changelog
 
+### 3.0.2
+
+* Upgraded socket.io from 4.7.5 to 4.8.1 to resolve vulnerability warning
+
+### 3.0.1
+
+* Upgraded socket.io from 4.7.2 to 4.7.5 to resolve vulnerability warning
+
+### 3.0.0
+
+* Upgraded socket.io from 2.5.0 to 4.7.2 to resolve vulnerability warning
+* Upgraded socket.io-redis from 5.2.0 to 6.1.0 to resolve vulnerability warning
+
+### 2.0.4
+
+* Upgraded semver from 4.3.6 to 7.5.2 to resolve vulnerability warning
+
+### 2.0.3
+
+* Upgraded async from 2.0.1 to 2.6.4 to resolve vulnerability warning
+
+### 2.0.2
+
+* Upgraded socket.io from 2.4.1 to 2.5.0 to resolve vulnerability warning
+
 ### 2.0.1
 
 * Upgraded socket.io from 2.2.0 to 2.4.1 to resolve deprecation warning
