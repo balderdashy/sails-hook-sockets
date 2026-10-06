@@ -21,7 +21,7 @@ branches:
     - master
     - for-sails-v0.12
 
-before_script: sudo redis-server /etc/redis/redis.conf --port 6380 --requirepass 'secret'
+before_script: sudo redis-server /etc/redis/redis.conf --port 6380 --requirepass 'secret' --daemonize yes --supervised no
 
 notifications:
   email:
