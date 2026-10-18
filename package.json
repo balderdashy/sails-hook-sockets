@@ -14,7 +14,7 @@
     "flaverr": "^1.0.0",
     "machinepack-redis": "^2.0.3",
     "machinepack-urls": "^6.0.2-0",
-    "proxy-addr": "1.1.5",
+    "proxy-addr": "2.0.8",
     "semver": "7.5.2",
     "socket.io": "4.8.1",
     "uid2": "0.0.3"
